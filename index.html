@@ -1,0 +1,2534 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquiGarcia — Materiais de Escritório, Alimentícios & Higienização | Luanda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  /* Verde alface */
+  --g50:  #f0fdf6;
+  --g100: #d1fae8;
+  --g200: #a3f5d1;
+  --g300: #5de8a8;
+  --g400: #22d47e;
+  --g500: #0bbf63;    /* verde principal */
+  --g600: #059950;
+  --g700: #07793f;
+  --g800: #0a5f33;
+  --g900: #0a4d2b;
+
+  /* Azul vivo */
+  --b50:  #eff6ff;
+  --b100: #dbeafe;
+  --b200: #bfdbfe;
+  --b300: #7ec4ff;
+  --b400: #3b9eff;    /* azul principal */
+  --b500: #1480f5;
+  --b600: #0d65d9;
+  --b700: #1251b0;
+  --b800: #153e87;
+  --b900: #162f64;
+
+  /* Neutros */
+  --ink:    #0f172a;
+  --ink2:   #1e293b;
+  --ink3:   #334155;
+  --ink4:   #64748b;
+  --ink5:   #94a3b8;
+  --border: #e2e8f0;
+  --surf:   #f8fafc;
+  --white:  #ffffff;
+
+  /* Shadows */
+  --sh-xs: 0 1px 2px rgba(0,0,0,.05);
+  --sh-sm: 0 2px 8px rgba(0,0,0,.08);
+  --sh-md: 0 4px 20px rgba(0,0,0,.10);
+  --sh-lg: 0 8px 40px rgba(0,0,0,.14);
+  --sh-xl: 0 20px 60px rgba(0,0,0,.18);
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 100px;
+
+  /* Transitions */
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4,h5,h6{font-family:'Sora',sans-serif;line-height:1.2;color:var(--ink)}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit;outline:none}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:var(--g500);border-radius:3px}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleUp{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes floatR{0%,100%{transform:translateY(0) rotate(3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes ripple{0%{transform:scale(0);opacity:.6}100%{transform:scale(4);opacity:0}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes borderGlow{0%,100%{box-shadow:0 0 0 0 rgba(11,191,99,.4)}50%{box-shadow:0 0 0 8px rgba(11,191,99,0)}}
+@keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blob{0%,100%{border-radius:60% 40% 30% 70% / 60% 30% 70% 40%}50%{border-radius:30% 60% 70% 40% / 50% 60% 30% 60%}}
+
+.anim-fadeUp    {animation:fadeUp .7s var(--ease) both}
+.anim-fadeIn    {animation:fadeIn .6s var(--ease) both}
+.anim-slideR    {animation:slideRight .7s var(--ease) both}
+.anim-slideL    {animation:slideLeft .7s var(--ease) both}
+.anim-scaleUp   {animation:scaleUp .5s var(--ease) both}
+.anim-float     {animation:float 4s ease-in-out infinite}
+.anim-floatR    {animation:floatR 3.5s ease-in-out infinite}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}
+.d4{animation-delay:.4s}.d5{animation-delay:.5s}.d6{animation-delay:.6s}
+
+/* Reveal on scroll */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal-left.visible{opacity:1;transform:none}
+.reveal-right{opacity:0;transform:translateX(32px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal-right.visible{opacity:1;transform:none}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT HELPERS
+═══════════════════════════════════════════════ */
+.container{max-width:1240px;margin:0 auto;padding:0 28px}
+.page{display:none!important}
+.page.active{display:block!important}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.flex-center{display:flex;align-items:center;justify-content:center}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.section{padding:88px 0}
+.section-alt{background:var(--surf)}
+
+/* Section header */
+.sec-tag{display:inline-flex;align-items:center;gap:6px;background:var(--g50);color:var(--g700);border:1px solid var(--g200);border-radius:var(--r-full);padding:5px 16px;font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+.sec-tag::before{content:'';width:6px;height:6px;background:var(--g500);border-radius:50%;animation:pulse 2s infinite}
+.sec-head{text-align:center;max-width:580px;margin:0 auto 56px}
+.sec-head h2{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:800;margin-bottom:14px}
+.sec-head p{color:var(--ink4);font-size:.97rem;line-height:1.75}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:var(--r-md);font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;transition:all .25s var(--ease);position:relative;overflow:hidden;white-space:nowrap}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.12);opacity:0;transition:opacity .2s}
+.btn:hover::after{opacity:1}
+.btn-primary{background:var(--g500);color:#fff;padding:13px 28px;font-size:.92rem}
+.btn-primary:hover{background:var(--g600);transform:translateY(-2px);box-shadow:0 8px 24px rgba(11,191,99,.35)}
+.btn-primary:active{transform:translateY(0)}
+.btn-blue{background:var(--b400);color:#fff;padding:13px 28px;font-size:.92rem}
+.btn-blue:hover{background:var(--b500);transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,158,255,.35)}
+.btn-outline{background:transparent;color:var(--ink3);border:1.5px solid var(--border);padding:12px 26px;font-size:.92rem}
+.btn-outline:hover{border-color:var(--g500);color:var(--g600);background:var(--g50)}
+.btn-ghost{background:transparent;color:var(--g600);padding:10px 20px;font-size:.88rem;border:1.5px solid var(--g200)}
+.btn-ghost:hover{background:var(--g50)}
+.btn-wa{background:#25D366;color:#fff;padding:13px 28px;font-size:.92rem}
+.btn-wa:hover{background:#1fba59;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.4)}
+.btn-sm{padding:9px 18px;font-size:.82rem}
+.btn-lg{padding:16px 36px;font-size:1rem}
+.btn-full{width:100%;justify-content:center}
+.btn-icon{width:38px;height:38px;padding:0;border-radius:var(--r-sm);background:var(--surf);border:1px solid var(--border);color:var(--ink4)}
+.btn-icon:hover{background:var(--g50);border-color:var(--g300);color:var(--g600)}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;flex-shrink:0}
+/* Ripple effect */
+.ripple-btn{position:relative;overflow:hidden}
+.ripple-btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);width:40px;height:40px;margin-top:-20px;margin-left:-20px;animation:ripple .6s linear;pointer-events:none}
+
+/* ═══════════════════════════════════════════════
+   HEADER / NAV
+═══════════════════════════════════════════════ */
+#header{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:box-shadow .3s}
+#header.scrolled{box-shadow:var(--sh-md)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1240px;margin:0 auto;padding:0 28px}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;flex-shrink:0}
+/* ┌─────────────────────────────────────────────────
+   │ LOGO PLACEHOLDER
+   │ Substitua a div .logo-icon por uma tag <img>:
+   │ <img src="SEU_LOGOTIPO.png" alt="AquiGarcia" style="height:38px;width:auto">
+   └───────────────────────────────────────────── */
+.logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--g500),var(--b400));display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s}
+.logo:hover .logo-icon{transform:rotate(-5deg) scale(1.05)}
+.logo-icon svg{width:22px;height:22px;fill:white}
+.logo-name{font-family:'Sora',sans-serif;font-size:1.18rem;font-weight:800;line-height:1;letter-spacing:-.02em}
+.logo-name span{color:var(--g500)}
+
+/* Desktop Nav */
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-link{background:none;border:none;padding:8px 13px;border-radius:var(--r-sm);font-size:.875rem;font-weight:500;color:var(--ink4);transition:all .2s;white-space:nowrap}
+.nav-link:hover{background:var(--g50);color:var(--g700)}
+.nav-link.active{background:var(--g50);color:var(--g700);font-weight:600}
+.nav-link.active::after{content:'';display:block;height:2px;background:var(--g500);border-radius:2px;margin-top:2px}
+
+/* Cart & Actions */
+.header-right{display:flex;align-items:center;gap:10px}
+.cart-btn{display:flex;align-items:center;gap:8px;background:var(--surf);border:1.5px solid var(--border);border-radius:var(--r-md);padding:9px 16px;font-size:.875rem;font-weight:600;color:var(--ink3);transition:all .2s;cursor:pointer;position:relative}
+.cart-btn:hover{border-color:var(--g400);color:var(--g700);background:var(--g50)}
+.cart-btn svg{width:17px;height:17px;stroke:currentColor}
+.cart-badge{position:absolute;top:-7px;right:-7px;background:var(--g500);color:#fff;font-size:.65rem;font-weight:800;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;display:none}
+.cart-badge.show{display:flex;animation:scaleUp .2s var(--ease)}
+.btn-signin{background:var(--ink);color:#fff;border:none;border-radius:var(--r-md);padding:10px 22px;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:600;transition:all .2s;cursor:pointer}
+.btn-signin:hover{background:var(--g600);transform:translateY(-1px);box-shadow:var(--sh-md)}
+
+/* Mobile hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:8px;cursor:pointer}
+.ham-line{width:22px;height:2px;background:var(--ink);border-radius:2px;transition:all .3s var(--ease)}
+.hamburger.open .ham-line:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open .ham-line:nth-child(2){opacity:0}
+.hamburger.open .ham-line:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* Mobile Nav Drawer */
+.mobile-nav{position:fixed;inset:0;top:68px;z-index:998;background:white;padding:20px 28px;display:flex;flex-direction:column;gap:4px;transform:translateX(-100%);transition:transform .35s var(--ease);border-top:1px solid var(--border)}
+.mobile-nav.open{transform:none}
+.mob-link{background:none;border:none;padding:14px 16px;border-radius:var(--r-md);font-size:1rem;font-weight:500;color:var(--ink3);text-align:left;transition:all .2s;border-bottom:1px solid var(--border)}
+.mob-link:hover{background:var(--g50);color:var(--g700)}
+.mob-link:last-child{border:none}
+
+/* ═══════════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════════ */
+.hero{position:relative;min-height:calc(100vh - 68px);display:flex;align-items:center;overflow:hidden;padding:68px 0 0;background:linear-gradient(135deg,var(--g50) 0%,#fff 45%,var(--b50) 100%)}
+
+/* Animated background blobs */
+.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none}
+.blob-1{width:500px;height:500px;background:radial-gradient(circle,var(--g300),transparent);top:-100px;right:-100px;animation:blob 12s infinite}
+.blob-2{width:350px;height:350px;background:radial-gradient(circle,var(--b300),transparent);bottom:-80px;left:-60px;animation:blob 10s 3s infinite}
+.blob-3{width:220px;height:220px;background:radial-gradient(circle,var(--g200),transparent);bottom:20%;right:25%;animation:float 7s infinite}
+
+/* Grid pattern overlay */
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(11,191,99,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(11,191,99,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1240px;margin:0 auto;padding:80px 28px}
+
+/* Hero Text */
+.hero-text{}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid var(--g200);border-radius:var(--r-full);padding:7px 16px;font-size:.8rem;font-weight:600;color:var(--g700);box-shadow:var(--sh-sm);margin-bottom:24px}
+.hero-badge .dot{width:8px;height:8px;background:var(--g500);border-radius:50%;animation:pulse 1.8s infinite}
+.hero-h1{font-size:clamp(2.4rem,4.5vw,3.6rem);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:22px}
+.hero-h1 .line-green{color:var(--g500)}
+.hero-h1 .line-blue{color:var(--b400)}
+.hero-h1 .line-underline{position:relative;display:inline-block}
+.hero-h1 .line-underline::after{content:'';position:absolute;left:0;bottom:-4px;width:100%;height:4px;background:linear-gradient(90deg,var(--g500),var(--b400));border-radius:2px}
+.hero-sub{font-size:1.05rem;color:var(--ink4);max-width:460px;line-height:1.75;margin-bottom:36px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+.hero-trust{display:flex;align-items:center;gap:16px}
+.trust-avatars{display:flex}
+.trust-avatar{width:34px;height:34px;border-radius:50%;border:2.5px solid white;margin-left:-10px;object-fit:cover;box-shadow:var(--sh-sm)}
+.trust-avatar:first-child{margin-left:0}
+.trust-text{font-size:.82rem;color:var(--ink4)}
+.trust-text strong{color:var(--g600);font-weight:700}
+.trust-stars{color:#f59e0b;font-size:.9rem;letter-spacing:1px}
+
+/* Hero Visual */
+.hero-visual{position:relative}
+.hero-main-img{width:100%;height:480px;object-fit:cover;border-radius:var(--r-xl);box-shadow:var(--sh-xl)}
+/* Photo placeholder comment in HTML */
+
+/* Floating cards */
+.float-card{position:absolute;background:white;border-radius:var(--r-md);padding:14px 18px;box-shadow:var(--sh-lg);display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px)}
+.float-card.fc1{top:32px;left:-32px;animation:float 4s ease-in-out infinite}
+.float-card.fc2{bottom:80px;right:-28px;animation:float 4.5s 1s ease-in-out infinite}
+.float-card.fc3{top:50%;left:-24px;transform:translateY(-50%);animation:float 3.8s .5s ease-in-out infinite}
+.fc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-icon.green{background:var(--g50)}
+.fc-icon.blue{background:var(--b50)}
+.fc-icon.yellow{background:#fffbeb}
+.fc-icon svg{width:20px;height:20px}
+.fc-label{font-size:.7rem;color:var(--ink5);font-weight:500}
+.fc-value{font-family:'Sora',sans-serif;font-size:1rem;font-weight:800;color:var(--ink);line-height:1.2}
+.fc-value small{font-size:.7rem;font-weight:500;color:var(--g500)}
+
+/* ═══════════════════════════════════════════════
+   TICKER / MARQUEE
+═══════════════════════════════════════════════ */
+.ticker{background:var(--g500);padding:13px 0;overflow:hidden;position:relative}
+.ticker-track{display:flex;gap:0;width:max-content;animation:marquee 30s linear infinite}
+.ticker-item{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:0 40px;font-size:.85rem;font-weight:600;color:white;letter-spacing:.02em}
+.ticker-sep{width:6px;height:6px;background:rgba(255,255,255,.5);border-radius:50%;display:inline-block}
+
+/* ═══════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════ */
+.stats-bar{background:var(--ink);padding:60px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center}
+.stat-item{padding:0 20px;position:relative}
+.stat-item+.stat-item::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(255,255,255,.12)}
+.stat-num{font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:900;background:linear-gradient(135deg,var(--g400),var(--b300));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.stat-label{font-size:.85rem;color:rgba(255,255,255,.55);letter-spacing:.02em}
+
+/* ═══════════════════════════════════════════════
+   CATEGORIES
+═══════════════════════════════════════════════ */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.cat-card{border-radius:var(--r-lg);overflow:hidden;cursor:pointer;border:1px solid var(--border);background:white;transition:all .35s var(--ease);box-shadow:var(--sh-sm);position:relative}
+.cat-card:hover{transform:translateY(-6px);box-shadow:var(--sh-xl);border-color:transparent}
+.cat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;z-index:1;border-radius:var(--r-lg)}
+.cat-card:nth-child(1)::before{background:linear-gradient(135deg,rgba(11,191,99,.04),transparent)}
+.cat-card:nth-child(2)::before{background:linear-gradient(135deg,rgba(59,158,255,.04),transparent)}
+.cat-card:nth-child(3)::before{background:linear-gradient(135deg,rgba(11,191,99,.04),transparent)}
+.cat-card:hover::before{opacity:1}
+.cat-img-wrap{overflow:hidden;height:200px}
+.cat-img{width:100%;height:200px;object-fit:cover;transition:transform .5s var(--ease)}
+.cat-card:hover .cat-img{transform:scale(1.06)}
+.cat-body{padding:24px;position:relative;z-index:2}
+.cat-badge{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink5);margin-bottom:6px}
+.cat-name{font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:8px}
+.cat-desc{font-size:.85rem;color:var(--ink4);line-height:1.6;margin-bottom:16px}
+.cat-link{display:flex;align-items:center;gap:6px;color:var(--g600);font-size:.85rem;font-weight:600}
+.cat-link svg{width:15px;height:15px;stroke:var(--g600);transition:transform .2s}
+.cat-card:hover .cat-link svg{transform:translateX(4px)}
+
+/* ═══════════════════════════════════════════════
+   PRODUCTS PAGE
+═══════════════════════════════════════════════ */
+.products-page-header{padding:100px 28px 40px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--g50),white)}
+.products-page-header h1{font-size:2.4rem;font-weight:900;margin-bottom:8px}
+.products-page-header p{color:var(--ink4)}
+
+/* Filters Bar */
+.filters-wrap{position:sticky;top:68px;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 28px}
+.filters-inner{max-width:1240px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:240px}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink5);pointer-events:none}
+.search-input{width:100%;padding:10px 14px 10px 42px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:.9rem;color:var(--ink);background:var(--surf);transition:all .2s}
+.search-input:focus{border-color:var(--g400);background:white;box-shadow:0 0 0 4px rgba(11,191,99,.08)}
+.filter-select{padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:.875rem;color:var(--ink);background:white;cursor:pointer;transition:all .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.filter-select:focus{border-color:var(--g400);box-shadow:0 0 0 4px rgba(11,191,99,.08)}
+.filter-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:.875rem;font-weight:600;color:var(--ink4);background:white;transition:all .2s;cursor:pointer}
+.filter-btn:hover,.filter-btn.active{border-color:var(--g400);color:var(--g700);background:var(--g50)}
+.filter-btn svg{width:15px;height:15px;stroke:currentColor}
+.results-count{font-size:.85rem;color:var(--ink5);margin-left:auto}
+
+/* Products Grid */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px;max-width:1240px;margin:0 auto;padding:28px 28px 80px}
+.product-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all .32s var(--ease);box-shadow:var(--sh-sm);cursor:pointer}
+.product-card:hover{transform:translateY(-6px);box-shadow:var(--sh-xl);border-color:rgba(11,191,99,.2)}
+.product-img-wrap{position:relative;overflow:hidden;height:210px;background:var(--surf)}
+.product-img{width:100%;height:210px;object-fit:cover;transition:transform .5s var(--ease)}
+.product-card:hover .product-img{transform:scale(1.07)}
+.product-cat-tag{position:absolute;top:12px;left:12px;background:white;border-radius:var(--r-full);padding:4px 12px;font-size:.72rem;font-weight:700;color:var(--g700);box-shadow:var(--sh-sm)}
+.product-wishlist{position:absolute;top:12px;right:12px;width:32px;height:32px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;box-shadow:var(--sh-sm);transition:all .2s}
+.product-wishlist:hover{background:var(--g50);transform:scale(1.1)}
+.product-wishlist svg{width:15px;height:15px;stroke:var(--ink4)}
+.product-body{padding:18px}
+.product-name{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.35}
+.product-desc{font-size:.82rem;color:var(--ink4);line-height:1.55;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.product-price{font-family:'Sora',sans-serif;font-size:1.25rem;font-weight:900;color:var(--g700)}
+.product-price small{font-size:.72rem;font-weight:500;color:var(--ink5);display:block;line-height:1;margin-bottom:2px}
+.product-stock{font-size:.75rem;color:var(--ink5)}
+.stock-dot{display:inline-block;width:7px;height:7px;background:var(--g500);border-radius:50%;margin-right:4px;animation:pulse 2s infinite}
+.stock-low{color:#f59e0b}
+.stock-low .stock-dot{background:#f59e0b}
+.product-footer{display:flex;gap:8px}
+.btn-add-cart{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:var(--g500);color:white;border:none;border-radius:var(--r-md);font-family:'Sora',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-add-cart:hover{background:var(--g600);transform:scale(1.02)}
+.btn-add-cart svg{width:15px;height:15px;stroke:white}
+.btn-product-wa{display:flex;align-items:center;justify-content:center;padding:10px 12px;background:#25D366;color:white;border:none;border-radius:var(--r-md);cursor:pointer;transition:all .2s}
+.btn-product-wa:hover{background:#1fba59;transform:scale(1.04)}
+.btn-product-wa svg{width:16px;height:16px;fill:white;display:block}
+/* Admin only controls */
+.admin-controls{display:none;flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.admin-controls.show{display:flex}
+.btn-edit-p,.btn-del-p{flex:1;padding:7px 10px;border-radius:var(--r-sm);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px solid var(--border);background:white;color:var(--ink4)}
+.btn-edit-p:hover{border-color:var(--b400);color:var(--b500);background:var(--b50)}
+.btn-del-p:hover{border-color:#ef4444;color:#ef4444;background:#fef2f2}
+.btn-edit-p svg,.btn-del-p svg{width:13px;height:13px;stroke:currentColor}
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--ink5)}
+.empty-state svg{width:64px;height:64px;stroke:#cbd5e1;margin:0 auto 16px}
+
+/* ═══════════════════════════════════════════════
+   CART DRAWER
+═══════════════════════════════════════════════ */
+.cart-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:1100;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+.cart-backdrop.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;right:0;top:0;bottom:0;width:430px;max-width:100vw;background:white;z-index:1101;box-shadow:var(--sh-xl);transform:translateX(100%);transition:transform .38s var(--ease);display:flex;flex-direction:column}
+.cart-drawer.open{transform:none}
+.cart-header{padding:22px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cart-header h3{font-size:1.1rem;font-weight:800}
+.cart-header-right{display:flex;align-items:center;gap:10px}
+.cart-count-label{font-size:.8rem;color:var(--ink5);background:var(--surf);border-radius:var(--r-full);padding:3px 10px;border:1px solid var(--border)}
+.cart-close-btn{width:32px;height:32px;border-radius:var(--r-sm);background:var(--surf);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.cart-close-btn:hover{background:var(--border)}
+.cart-close-btn svg{width:16px;height:16px;stroke:var(--ink3)}
+.cart-body{flex:1;overflow-y:auto;padding:20px 24px}
+.cart-empty-state{text-align:center;padding:60px 20px;color:var(--ink5)}
+.cart-empty-state svg{width:52px;height:52px;stroke:#cbd5e1;margin:0 auto 14px}
+.cart-empty-state p{font-weight:600;color:var(--ink4);margin-bottom:4px}
+.cart-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.cart-item:last-child{border-bottom:none}
+.cart-item-img{width:66px;height:66px;object-fit:cover;border-radius:var(--r-sm);flex-shrink:0;border:1px solid var(--border)}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:.875rem;font-weight:700;color:var(--ink);margin-bottom:4px;font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item-price{font-size:.875rem;font-weight:700;color:var(--g700)}
+.cart-item-controls{display:flex;align-items:center;gap:10px;margin-top:8px}
+.qty-btn{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--ink3);transition:all .2s}
+.qty-btn:hover{border-color:var(--g400);color:var(--g600)}
+.qty-val{font-size:.9rem;font-weight:700;min-width:22px;text-align:center}
+.cart-remove{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--ink5);transition:color .2s;display:flex}
+.cart-remove:hover{color:#ef4444}
+.cart-remove svg{width:15px;height:15px;stroke:currentColor}
+.cart-footer{padding:20px 24px;border-top:1px solid var(--border);flex-shrink:0}
+.cart-summary{background:var(--surf);border-radius:var(--r-md);padding:16px;margin-bottom:14px}
+.cart-summary-row{display:flex;justify-content:space-between;font-size:.875rem;color:var(--ink4);margin-bottom:8px}
+.cart-summary-row:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid var(--border);font-weight:700;color:var(--ink);font-size:1rem}
+.cart-summary-row:last-child span:last-child{color:var(--g700);font-family:'Sora',sans-serif;font-size:1.1rem}
+.cart-wa-btn{width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:var(--r-md);font-family:'Sora',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.cart-wa-btn:hover{background:#1fba59;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.4)}
+.cart-wa-btn svg{width:20px;height:20px;fill:white}
+.cart-wa-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ═══════════════════════════════════════════════
+   FEATURES / WHY US
+═══════════════════════════════════════════════ */
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.feature-card{text-align:center;padding:32px 20px;border-radius:var(--r-lg);border:1px solid var(--border);background:white;transition:all .3s}
+.feature-card:hover{border-color:var(--g300);box-shadow:var(--sh-md);transform:translateY(-4px)}
+.feature-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.feature-icon.green{background:var(--g50)}
+.feature-icon.blue{background:var(--b50)}
+.feature-icon.yellow{background:#fffbeb}
+.feature-icon.purple{background:#f5f3ff}
+.feature-icon svg{width:26px;height:26px}
+.feature-card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:.85rem;color:var(--ink4);line-height:1.65}
+
+/* ═══════════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════════ */
+.testimonial-track{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.testimonial-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-sm);transition:all .3s;position:relative}
+.testimonial-card:hover{box-shadow:var(--sh-lg);transform:translateY(-4px);border-color:rgba(11,191,99,.2)}
+.t-quote{position:absolute;top:20px;right:22px;font-size:3rem;color:var(--g100);font-family:'Sora',sans-serif;line-height:1}
+.t-stars{display:flex;gap:3px;margin-bottom:14px}
+.t-stars svg{width:16px;height:16px;fill:#f59e0b}
+.t-text{font-size:.9rem;color:var(--ink3);line-height:1.75;font-style:italic;margin-bottom:20px;position:relative;z-index:1}
+.t-author{display:flex;align-items:center;gap:12px}
+.t-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--g100)}
+.t-name{font-size:.875rem;font-weight:700;color:var(--ink);font-family:'Sora',sans-serif}
+.t-role{font-size:.78rem;color:var(--ink5)}
+
+/* ═══════════════════════════════════════════════
+   CTA SECTION
+═══════════════════════════════════════════════ */
+.cta-section{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--g700) 0%,var(--g900) 50%,var(--b700) 100%);border-radius:var(--r-xl);padding:80px 60px;text-align:center;margin:0 28px}
+.cta-bg-shape{position:absolute;border-radius:50%;opacity:.12}
+.cta-shape-1{width:400px;height:400px;background:var(--g300);top:-150px;right:-100px}
+.cta-shape-2{width:280px;height:280px;background:var(--b300);bottom:-100px;left:-80px}
+.cta-inner{position:relative;z-index:2}
+.cta-section h2{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:900;color:white;margin-bottom:14px}
+.cta-section p{color:rgba(255,255,255,.75);margin-bottom:32px;max-width:520px;margin-left:auto;margin-right:auto;font-size:1rem}
+.cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ═══════════════════════════════════════════════
+   SERVICES PAGE
+═══════════════════════════════════════════════ */
+.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.service-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:white;box-shadow:var(--sh-sm);transition:all .32s}
+.service-card:hover{transform:translateY(-5px);box-shadow:var(--sh-xl)}
+.service-card img{width:100%;height:220px;object-fit:cover}
+.service-body{padding:28px}
+.service-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.service-icon.green{background:var(--g50)}
+.service-icon.blue{background:var(--b50)}
+.service-icon svg{width:24px;height:24px}
+.service-body h3{font-size:1.1rem;font-weight:800;margin-bottom:10px}
+.service-body p{font-size:.875rem;color:var(--ink4);line-height:1.7;margin-bottom:20px}
+
+/* ═══════════════════════════════════════════════
+   CURIOSITIES PAGE
+═══════════════════════════════════════════════ */
+.curio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.curio-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-sm);transition:all .3s;position:relative;overflow:hidden}
+.curio-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g500),var(--b400));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.curio-card:hover::after{transform:scaleX(1)}
+.curio-card:hover{transform:translateY(-5px);box-shadow:var(--sh-lg);border-color:transparent}
+.curio-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.curio-icon.green{background:var(--g50)}
+.curio-icon.blue{background:var(--b50)}
+.curio-icon.orange{background:#fff7ed}
+.curio-icon svg{width:24px;height:24px}
+.curio-card h3{font-size:.97rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.4}
+.curio-card p{font-size:.85rem;color:var(--ink4);line-height:1.7;margin-bottom:18px}
+.curio-cta{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:var(--g600);border:1.5px solid var(--g200);border-radius:var(--r-sm);padding:7px 14px;transition:all .2s;cursor:pointer}
+.curio-cta:hover{background:var(--g500);color:white;border-color:var(--g500)}
+.curio-cta svg{width:13px;height:13px;stroke:currentColor}
+
+/* ═══════════════════════════════════════════════
+   FEEDBACK PAGE
+═══════════════════════════════════════════════ */
+.feedback-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:start}
+.feedback-info h2{font-size:1.8rem;font-weight:800;margin-bottom:14px}
+.feedback-info p{color:var(--ink4);line-height:1.75;margin-bottom:28px}
+.feedback-perks{display:flex;flex-direction:column;gap:16px}
+.fb-perk{display:flex;align-items:flex-start;gap:14px}
+.perk-icon{width:40px;height:40px;border-radius:10px;background:var(--g50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.perk-icon svg{width:20px;height:20px;stroke:var(--g600)}
+.perk-text h4{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:3px}
+.perk-text p{font-size:.82rem;color:var(--ink4)}
+.feedback-form-card{background:white;border-radius:var(--r-xl);padding:40px;box-shadow:var(--sh-lg);border:1px solid var(--border)}
+.form-group{margin-bottom:20px}
+label.form-label{display:block;font-size:.83rem;font-weight:600;color:var(--ink3);margin-bottom:6px}
+.form-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:.9rem;color:var(--ink);background:var(--surf);transition:all .2s}
+.form-input:focus{border-color:var(--g400);background:white;box-shadow:0 0 0 4px rgba(11,191,99,.08)}
+.form-input::placeholder{color:var(--ink5)}
+.form-textarea{resize:vertical;min-height:120px}
+.star-rating{display:flex;gap:6px}
+.star-btn{font-size:1.9rem;cursor:pointer;color:#e2e8f0;transition:color .15s;border:none;background:none;padding:0;line-height:1}
+.star-btn.active{color:#f59e0b}
+.star-btn:hover{color:#f59e0b}
+.success-box{text-align:center;padding:48px 20px}
+.success-icon{width:72px;height:72px;background:var(--g50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.success-icon svg{width:34px;height:34px;stroke:var(--g500)}
+.success-box h3{font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.success-box p{color:var(--ink4)}
+
+/* ═══════════════════════════════════════════════
+   ABOUT PAGE
+═══════════════════════════════════════════════ */
+.about-img{width:100%;height:440px;object-fit:cover;border-radius:var(--r-xl);box-shadow:var(--sh-xl)}
+.about-content .sec-tag{display:inline-flex;margin-bottom:14px}
+.about-content h2{font-size:2.2rem;font-weight:900;margin-bottom:18px}
+.about-content p{color:var(--ink4);line-height:1.8;margin-bottom:14px}
+.about-values{margin-top:28px;display:flex;flex-direction:column;gap:14px}
+.about-value{display:flex;align-items:flex-start;gap:12px}
+.av-dot{width:8px;height:8px;background:linear-gradient(135deg,var(--g500),var(--b400));border-radius:50%;flex-shrink:0;margin-top:7px}
+.av-text strong{color:var(--ink);font-weight:700;display:block;font-size:.9rem;margin-bottom:2px}
+.av-text span{font-size:.85rem;color:var(--ink4)}
+
+/* Admin trigger area */
+.admin-gate{margin-top:40px;padding-top:36px;border-top:1px solid var(--border);text-align:center}
+.admin-gate p{font-size:.85rem;color:var(--ink5);margin-bottom:12px}
+.admin-gate-btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:white;border:none;border-radius:var(--r-md);padding:12px 24px;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;transition:all .2s}
+.admin-gate-btn:hover{background:var(--g700)}
+.admin-gate-btn svg{width:16px;height:16px;stroke:white}
+
+/* Admin panel */
+.admin-panel-wrap{display:none;margin-top:28px}
+.admin-panel-wrap.active{display:block}
+.admin-panel{background:white;border:1.5px solid var(--g300);border-radius:var(--r-lg);padding:32px;box-shadow:0 0 0 6px rgba(11,191,99,.06)}
+.admin-panel-head{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.admin-panel-head h4{font-size:1rem;font-weight:800}
+.admin-panel-head svg{width:18px;height:18px;stroke:var(--g600)}
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.admin-form .span2{grid-column:1/-1}
+.admin-form-actions{grid-column:1/-1;display:flex;gap:10px;margin-top:4px}
+.btn-save-prod{background:var(--g500);color:white;border:none;border-radius:var(--r-md);padding:11px 24px;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-save-prod:hover{background:var(--g600)}
+.btn-cancel-edit{background:white;color:var(--ink4);border:1.5px solid var(--border);border-radius:var(--r-md);padding:11px 20px;font-size:.875rem;font-weight:600;cursor:pointer;display:none;transition:all .2s}
+.btn-cancel-edit:hover{background:var(--surf)}
+
+/* ═══════════════════════════════════════════════
+   CONTACT PAGE
+═══════════════════════════════════════════════ */
+.contact-layout{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:start}
+.contact-cards{display:flex;flex-direction:column;gap:16px}
+.contact-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;display:flex;align-items:flex-start;gap:16px;box-shadow:var(--sh-sm);transition:all .2s}
+.contact-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.c-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.c-icon.green{background:var(--g50)}
+.c-icon.blue{background:var(--b50)}
+.c-icon svg{width:21px;height:21px}
+.c-info h4{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:6px}
+.c-info p,.c-info a{font-size:.875rem;color:var(--ink4);line-height:1.7}
+.c-info a{color:var(--g600);font-weight:500}
+.c-info a:hover{text-decoration:underline}
+.map-container{border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border);box-shadow:var(--sh-md)}
+.map-container iframe{display:block;width:100%;min-height:440px}
+
+/* ═══════════════════════════════════════════════
+   LOGIN MODAL
+═══════════════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.login-modal{width:100%;max-width:440px;background:white;border-radius:var(--r-xl);overflow:hidden;transform:scale(.94) translateY(20px);transition:transform .35s var(--ease);box-shadow:var(--sh-xl)}
+.modal-bg.open .login-modal{transform:none}
+.login-modal-hero{position:relative;height:120px;background:linear-gradient(135deg,var(--g600),var(--b500));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.login-modal-hero-bg{position:absolute;inset:0;opacity:.15}
+.login-modal-hero-bg circle{fill:white}
+.login-modal-brand{text-align:center;position:relative;z-index:2}
+.login-modal-brand .logo-icon{margin:0 auto 6px;width:44px;height:44px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4)}
+.login-modal-brand p{color:rgba(255,255,255,.9);font-size:.82rem}
+.login-modal-brand .logo-name{color:white;font-size:1.1rem}
+.modal-close{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;border-radius:var(--r-sm);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10}
+.modal-close:hover{background:rgba(255,255,255,.35)}
+.modal-close svg{width:15px;height:15px;stroke:white}
+.login-modal-body{padding:32px}
+.auth-tabs{display:flex;background:var(--surf);border-radius:var(--r-md);padding:4px;gap:4px;margin-bottom:26px}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;background:none;color:var(--ink4);transition:all .2s}
+.auth-tab.active{background:white;color:var(--ink);box-shadow:var(--sh-sm)}
+.login-modal-body .form-group{margin-bottom:16px}
+.login-modal-body .form-input{background:var(--surf)}
+.modal-note{text-align:center;font-size:.78rem;color:var(--ink5);margin-top:14px}
+
+/* ═══════════════════════════════════════════════
+   ADMIN MODAL
+═══════════════════════════════════════════════ */
+.admin-modal{max-width:380px}
+.admin-modal-head{text-align:center;margin-bottom:24px}
+.admin-modal-head .shield-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--g50),var(--b50));border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.admin-modal-head svg{width:28px;height:28px;stroke:var(--g600)}
+.admin-modal-head h3{font-size:1.2rem;font-weight:800;margin-bottom:6px}
+.admin-modal-head p{font-size:.875rem;color:var(--ink4)}
+.admin-modal .login-modal-body{padding:0 32px 32px}
+.error-shake{animation:shake .4s var(--ease)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.input-error{border-color:#ef4444!important;box-shadow:0 0 0 4px rgba(239,68,68,.08)!important}
+
+/* ═══════════════════════════════════════════════
+   PAGE HERO (inner pages)
+═══════════════════════════════════════════════ */
+.page-hero{padding:100px 28px 50px;background:linear-gradient(135deg,var(--g50) 0%,white 60%,var(--b50) 100%);border-bottom:1px solid var(--border)}
+.page-hero h1{font-size:clamp(2rem,4vw,2.8rem);font-weight:900;margin-bottom:10px}
+.page-hero p{color:var(--ink4);font-size:1rem;max-width:600px}
+.page-breadcrumb{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--ink5);margin-bottom:14px}
+.page-breadcrumb span:not(:last-child)::after{content:'/'margin-left:8px;color:var(--border)}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:var(--ink);color:white;border-radius:var(--r-md);padding:14px 20px;font-size:.875rem;font-weight:600;box-shadow:var(--sh-xl);display:flex;align-items:center;gap:10px;transform:translateY(100px);opacity:0;transition:all .35s var(--ease);max-width:360px}
+.toast.show{transform:none;opacity:1}
+.toast.toast-success{background:var(--g600)}
+.toast.toast-error{background:#dc2626}
+.toast-icon{width:18px;height:18px;flex-shrink:0}
+.toast-icon svg{width:100%;height:100%;stroke:white;display:block}
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer{background:var(--ink2);color:white;padding:72px 0 0}
+.footer-top{max-width:1240px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:48px;padding-bottom:56px;border-bottom:1px solid rgba(255,255,255,.08)}
+.footer-brand p{color:rgba(255,255,255,.5);font-size:.875rem;line-height:1.75;margin-top:16px;max-width:280px}
+.footer-social{display:flex;gap:10px;margin-top:20px}
+.social-btn{width:36px;height:36px;border-radius:var(--r-sm);background:rgba(255,255,255,.08);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.social-btn:hover{background:var(--g500)}
+.social-btn svg{width:16px;height:16px;stroke:rgba(255,255,255,.7)}
+.footer-col h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.4);margin-bottom:18px}
+.footer-col a,.footer-col button{display:block;background:none;border:none;text-align:left;color:rgba(255,255,255,.65);font-size:.875rem;margin-bottom:10px;padding:0;cursor:pointer;transition:color .2s;font-family:'Inter',sans-serif}
+.footer-col a:hover,.footer-col button:hover{color:var(--g400)}
+.footer-bottom{max-width:1240px;margin:0 auto;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-bottom p{color:rgba(255,255,255,.3);font-size:.82rem}
+.footer-admin-link{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:var(--r-sm);padding:7px 14px;font-size:.78rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.footer-admin-link:hover{background:rgba(255,255,255,.12);color:white}
+.footer-admin-link svg{width:12px;height:12px;stroke:currentColor}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media(max-width:900px){
+  .nav-links{display:none}
+  .btn-signin{display:none}
+  .hamburger{display:flex}
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .hero-visual{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-item{padding:20px 0}
+  .stat-item::before{display:none}
+  .cat-grid{grid-template-columns:1fr 1fr}
+  .testimonial-track{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
+  .services-grid{grid-template-columns:1fr}
+  .curio-grid{grid-template-columns:1fr 1fr}
+  .contact-layout{grid-template-columns:1fr}
+  .feedback-layout{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .container{padding:0 16px}
+  .section{padding:60px 0}
+  .cat-grid{grid-template-columns:1fr}
+  .curio-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr}
+  .cta-section{padding:56px 28px;margin:0 16px;border-radius:var(--r-lg)}
+  .hero-inner{padding:60px 16px}
+  .products-page-header{padding:90px 16px 32px}
+  .filters-wrap{padding:12px 16px}
+  .products-grid{padding:20px 16px 60px}
+  .admin-form{grid-template-columns:1fr}
+  .admin-form .span2{grid-column:1}
+  .ticker-item{padding:0 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     TOAST
+═══════════════════════════════════════════ -->
+<div id="toast" class="toast">
+  <div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN MODAL
+═══════════════════════════════════════════ -->
+<div id="loginModalBg" class="modal-bg">
+  <div class="login-modal anim-scaleUp">
+    <div class="login-modal-hero">
+      <svg class="login-modal-hero-bg" viewBox="0 0 440 120" preserveAspectRatio="none">
+        <circle cx="380" cy="20" r="80" opacity=".3"/><circle cx="60" cy="100" r="60" opacity=".2"/><circle cx="220" cy="60" r="120" opacity=".1"/>
+      </svg>
+      <div class="login-modal-brand">
+        <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/></svg></div>
+        <div class="logo-name">Aqui<span>Garcia</span></div>
+        <p>A sua conta pessoal</p>
+      </div>
+      <button class="modal-close" onclick="closeLoginModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="login-modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sessão</button>
+        <button class="auth-tab" id="tabReg" onclick="switchAuthTab('register')">Criar Conta</button>
+      </div>
+      <div id="registerExtra" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Nome completo</label>
+          <input class="form-input" type="text" id="authName" placeholder="O seu nome">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço de email</label>
+        <input class="form-input" type="email" id="authEmail" placeholder="nome@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" type="password" id="authPass" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuth()">Iniciar Sessão</button>
+      <p class="modal-note">Ao continuar, aceita os nossos Termos de Serviço.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ADMIN MODAL
+═══════════════════════════════════════════ -->
+<div id="adminModalBg" class="modal-bg">
+  <div class="login-modal admin-modal anim-scaleUp">
+    <div class="login-modal-body" style="padding:32px">
+      <div class="admin-modal-head">
+        <div class="shield-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+        <h3>Área Restrita</h3>
+        <p>Insira a senha de administrador para aceder ao painel de gestão</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha de acesso</label>
+        <input class="form-input" type="password" id="adminPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleAdminLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="handleAdminLogin()">Aceder ao Painel</button>
+      <button class="btn btn-outline btn-full" style="margin-top:10px" onclick="closeAdminModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CART DRAWER
+═══════════════════════════════════════════ -->
+<div id="cartBackdrop" class="cart-backdrop" onclick="closeCart()"></div>
+<div id="cartDrawer" class="cart-drawer">
+  <div class="cart-header">
+    <h3>Carrinho</h3>
+    <div class="cart-header-right">
+      <span class="cart-count-label" id="cartCountLabel">0 itens</span>
+      <button class="cart-close-btn" onclick="closeCart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+      <p>Carrinho vazio</p>
+      <small>Adicione produtos para continuar</small>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-summary" id="cartSummary" style="display:none">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal">0 Kz</span></div>
+      <div class="cart-summary-row"><span>Entrega</span><span style="color:var(--g600)">A calcular</span></div>
+      <div class="cart-summary-row"><span>Total estimado</span><span id="cartTotal">0 Kz</span></div>
+    </div>
+    <button class="cart-wa-btn" onclick="sendCartWhatsApp()" id="cartWaBtn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+      Encomendar via WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header id="header">
+  <div class="header-inner">
+     <img src="imagens/logo.png" alt="AquiGarcia" style="height: 70px"> 
+    <div class="logo" onclick="navigateTo('home')">
+      <span class="logo-name">Aqui<span>Garcia</span></span>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-link active" data-page="home"    onclick="navigateTo('home')">Início</button>
+      <button class="nav-link"        data-page="products" onclick="navigateTo('products')">Produtos</button>
+      <button class="nav-link"        data-page="services" onclick="navigateTo('services')">Serviços</button>
+      <button class="nav-link"        data-page="curiosities" onclick="navigateTo('curiosities')">Curiosidades</button>
+      <button class="nav-link"        data-page="feedback" onclick="navigateTo('feedback')">Feedback</button>
+      <button class="nav-link"        data-page="about"   onclick="navigateTo('about')">Sobre Nós</button>
+      <button class="nav-link"        data-page="contact" onclick="navigateTo('contact')">Contacto</button>
+    </nav>
+
+    <div class="header-right">
+      <button class="cart-btn" onclick="openCart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+        Carrinho
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <button class="btn-signin" onclick="openLoginModal()">Entrar</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+        <div class="ham-line"></div><div class="ham-line"></div><div class="ham-line"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mob-link" onclick="navigateTo('home');closeMobileNav()">Início</button>
+  <button class="mob-link" onclick="navigateTo('products');closeMobileNav()">Produtos</button>
+  <button class="mob-link" onclick="navigateTo('services');closeMobileNav()">Serviços</button>
+  <button class="mob-link" onclick="navigateTo('curiosities');closeMobileNav()">Curiosidades</button>
+  <button class="mob-link" onclick="navigateTo('feedback');closeMobileNav()">Feedback</button>
+  <button class="mob-link" onclick="navigateTo('about');closeMobileNav()">Sobre Nós</button>
+  <button class="mob-link" onclick="navigateTo('contact');closeMobileNav()">Contacto</button>
+  <button class="mob-link" style="color:var(--g600);font-weight:600" onclick="openLoginModal();closeMobileNav()">Iniciar Sessão / Criar Conta</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: HOME
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-blob blob-3"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge anim-fadeUp"><span class="dot"></span> Entrega em 24h em Luanda</div>
+        <h1 class="hero-h1 anim-fadeUp d1">
+          O seu fornecedor<br>
+          <span class="line-green">de confiança</span><br>
+          em <span class="line-underline">Angola</span>
+        </h1>
+        <p class="hero-sub anim-fadeUp d2">Materiais de escritório, alimentícios não perecíveis e produtos de higienização — tudo num só lugar, com os melhores preços de Luanda.</p>
+        <div class="hero-actions anim-fadeUp d3">
+          <button class="btn btn-primary btn-lg ripple-btn" onclick="navigateTo('products')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:18px;height:18px"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/></svg>
+            Ver Catálogo
+          </button>
+          <a href="https://wa.me/244934707745?text=Olá! Gostaria de mais informações sobre os produtos da AquiGarcia." target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+            WhatsApp
+          </a>
+          <button class="btn btn-ghost btn-lg" onclick="openLoginModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Entrar
+          </button>
+        </div>
+        <div class="hero-trust anim-fadeUp d4">
+          <div class="trust-avatars">
+            <img class="trust-avatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=60&q=80&fit=crop&crop=face" alt="">
+            <img class="trust-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=80&fit=crop&crop=face" alt="">
+            <img class="trust-avatar" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80&fit=crop&crop=face" alt="">
+            <img class="trust-avatar" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80&fit=crop&crop=face" alt="">
+          </div>
+          <div>
+            <div class="trust-stars">★★★★★</div>
+            <p class="trust-text"><strong>+2.000</strong> clientes satisfeitos em Luanda</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO VISUAL -->
+      <div class="hero-visual anim-slideL d2">
+        
+        <img src="162648ce-46bc-433a-a6cc-473313c6ea77.jpeg" alt="AquiGarcia - Escritório moderno" class="hero-main-img">
+
+        <!-- Floating card 1 -->
+        <div class="float-card fc1">
+          <div class="fc-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="var(--g600)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="fc-label">Pedidos hoje</div>
+            <div class="fc-value">+47 <small>entregues</small></div>
+          </div>
+        </div>
+
+        <!-- Floating card 2 -->
+        <div class="float-card fc2">
+          <div class="fc-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="var(--b500)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="fc-label">Avaliação média</div>
+            <div class="fc-value">4.9 <small>/ 5.0</small></div>
+          </div>
+        </div>
+
+        <!-- Floating card 3 -->
+        <div class="float-card fc3">
+          <div class="fc-icon yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="#f59e0b"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/></svg>
+          </div>
+          <div>
+            <div class="fc-label">Stock disponível</div>
+            <div class="fc-value">500+ <small>produtos</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-item"><span class="ticker-sep"></span>Entrega em 24h em Luanda</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Materiais de Escritório de Qualidade</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Produtos Alimentícios Não Perecíveis</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Higienização Profissional</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Preços Competitivos em Angola</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>+2000 Clientes Satisfeitos</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Fornecimento Corporativo</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Kits Personalizados para Eventos</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker-item"><span class="ticker-sep"></span>Entrega em 24h em Luanda</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Materiais de Escritório de Qualidade</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Produtos Alimentícios Não Perecíveis</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Higienização Profissional</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Preços Competitivos em Angola</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>+2000 Clientes Satisfeitos</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Fornecimento Corporativo</span>
+      <span class="ticker-item"><span class="ticker-sep"></span>Kits Personalizados para Eventos</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-grid container">
+      <div class="stat-item reveal"><div class="stat-num">500+</div><div class="stat-label">Produtos em catálogo</div></div>
+      <div class="stat-item reveal d1"><div class="stat-num">2.000+</div><div class="stat-label">Clientes satisfeitos</div></div>
+      <div class="stat-item reveal d2"><div class="stat-num">24h</div><div class="stat-label">Prazo de entrega</div></div>
+      <div class="stat-item reveal d3"><div class="stat-num">5x</div><div class="stat-label">Mais rápidos</div></div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Categorias</div>
+        <h2>O que fornecemos</h2>
+        <p>Três categorias essenciais, cuidadosamente selecionadas para manter o seu negócio a funcionar sem interrupções.</p>
+      </div>
+      <div class="cat-grid">
+        <div class="cat-card reveal" onclick="navigateTo('products');filterCategory('escritorio')">
+          <div class="cat-img-wrap"><img class="cat-img" src="cc754b6d-43c2-4b39-9336-54cec8833f90.jpeg" alt="Material de Escritório" loading="lazy"></div>
+          <div class="cat-body">
+            <div class="cat-badge">Categoria 01</div>
+            <div class="cat-name">Material de Escritório</div>
+            <div class="cat-desc">Papel, canetas, arquivadores, material de impressão e tudo o que o seu escritório necessita diariamente.</div>
+            <div class="cat-link">Ver produtos <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </div>
+        </div>
+        <div class="cat-card reveal d1" onclick="navigateTo('products');filterCategory('alimenticios')">
+          <div class="cat-img-wrap"><img class="cat-img" src="imagens/alimenticois.jpg" alt="Alimentícios" loading="lazy"></div>
+          <div class="cat-body">
+            <div class="cat-badge">Categoria 02</div>
+            <div class="cat-name">Alimentícios Não Perecíveis</div>
+            <div class="cat-desc">Conservas, grãos, óleos, massas e produtos de longa duração para abastecer o seu dia a dia.</div>
+            <div class="cat-link">Ver produtos <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </div>
+        </div>
+        <div class="cat-card reveal d2" onclick="navigateTo('products');filterCategory('higienizacao')">
+          <div class="cat-img-wrap"><img class="cat-img" src="204fb20b-ad4e-4c26-b438-659290f4a32a.jpeg" alt="Higienização" loading="lazy"></div>
+          <div class="cat-body">
+            <div class="cat-badge">Categoria 03</div>
+            <div class="cat-name">Higienização</div>
+            <div class="cat-desc">Detergentes, desinfetantes, sabões e material de limpeza profissional para espaços saudáveis.</div>
+            <div class="cat-link">Ver produtos <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY US / FEATURES -->
+  <div class="section section-alt">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Porquê a AquiGarcia?</div>
+        <h2>Vantagens que fazem a diferença</h2>
+        <p>Escolher a AquiGarcia é escolher qualidade, rapidez e tranquilidade para o seu negócio.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <h3>Entrega em 24 horas</h3>
+          <p>Entregamos em toda Luanda em até 24h úteis. Pedidos antes das 13h saem no mesmo dia.</p>
+        </div>
+        <div class="feature-card reveal d1">
+          <div class="feature-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="var(--b500)" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Qualidade garantida</h3>
+          <p>Todos os produtos passam por controlo de qualidade rigoroso antes de chegarem até si.</p>
+        </div>
+        <div class="feature-card reveal d2">
+          <div class="feature-icon yellow"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <h3>Preços competitivos</h3>
+          <p>Melhores preços de Luanda com tabelas especiais para empresas e compras em volume.</p>
+        </div>
+        <div class="feature-card reveal d3">
+          <div class="feature-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>Suporte dedicado</h3>
+          <p>Equipa disponível de segunda a sábado para responder às suas dúvidas em menos de 2 horas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Testemunhos</div>
+        <h2>O que dizem os nossos clientes</h2>
+        <p>Experiências reais de empresas e profissionais que confiam na AquiGarcia há anos.</p>
+      </div>
+      <div class="testimonial-track">
+        <div class="testimonial-card reveal">
+          <div class="t-quote">"</div>
+          <div class="t-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <p class="t-text">"Serviço impecável. Os materiais de escritório chegaram no mesmo dia com embalagem perfeita. Preços muito acessíveis e atendimento de excelência. Recomendo vivamente!"</p>
+          <div class="t-author">
+            <img class="t-avatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&q=80&fit=crop&crop=face" alt="Maria Santos">
+            <div><div class="t-name">Maria Agostinho</div><div class="t-role">Empresária, Luanda</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal d1">
+          <div class="t-quote">"</div>
+          <div class="t-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <p class="t-text">"Giro o stock de higienização do nosso condomínio exclusivamente com a AquiGarcia. Produtos sempre a tempo, qualidade garantida e a equipa é super-profissional. Parceiros de longa data!"</p>
+          <div class="t-author">
+            <img class="t-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80&fit=crop&crop=face" alt="João Fernandes">
+            <div><div class="t-name">Abel Fernandes</div><div class="t-role">Gestor de Recursos humanos</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal d2">
+          <div class="t-quote">"</div>
+          <div class="t-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <p class="t-text">"A AquiGarcia gere todo o aprovisionamento do nosso escritório. Qualidade excepcional, preços justos e nunca houve uma falha de entrega. São mesmo de confiança!"</p>
+          <div class="t-author">
+            <img class="t-avatar" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=80&q=80&fit=crop&crop=face" alt="Ana Domingos">
+            <div><div class="t-name">Ermelinda Cassongo</div><div class="t-role">Directora Administrativa</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section" style="padding-top:0">
+    <div class="cta-section reveal">
+      <div class="cta-bg-shape cta-shape-1"></div>
+      <div class="cta-bg-shape cta-shape-2"></div>
+      <div class="cta-inner">
+        <h2>Pronto para fazer o seu pedido?</h2>
+        <p>Envie a sua lista de compras via WhatsApp e receba um orçamento personalizado em poucos minutos!</p>
+        <div class="cta-actions">
+          <a href="https://wa.me/244934707745?text=Olá! Gostaria de fazer um pedido." target="_blank" rel="noopener noreferrer" class="btn btn-wa btn-lg">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+            Encomendar via WhatsApp
+          </a>
+          <button class="btn btn-outline btn-lg" style="border-color:rgba(255,255,255,.3);color:white" onclick="navigateTo('products')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:16px;height:16px"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/></svg>
+            Ver Catálogo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: PRODUCTS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-products" class="page">
+  <div class="products-page-header">
+    <div class="container">
+      <div class="page-breadcrumb">
+        <span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span>
+        <span style="margin:0 6px;color:var(--border)">/</span>
+        <span>Produtos</span>
+      </div>
+      <h1>Catálogo de Produtos</h1>
+      <p>Explore a nossa seleção completa — use os filtros para encontrar exatamente o que precisa.</p>
+    </div>
+  </div>
+
+  <div class="filters-wrap">
+    <div class="filters-inner">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar produtos..." oninput="renderProducts()">
+      </div>
+      <select id="catFilter" class="filter-select" onchange="renderProducts()">
+        <option value="all">Todas as categorias</option>
+        <option value="escritorio">Material de Escritório</option>
+        <option value="alimenticios">Alimentícios</option>
+        <option value="higienizacao">Higienização</option>
+      </select>
+      <select id="sortFilter" class="filter-select" onchange="renderProducts()">
+        <option value="name-asc">Nome: A — Z</option>
+        <option value="name-desc">Nome: Z — A</option>
+        <option value="price-asc">Preço: crescente</option>
+        <option value="price-desc">Preço: decrescente</option>
+        <option value="stock-desc">Maior stock</option>
+      </select>
+      <select id="priceFilter" class="filter-select" onchange="renderProducts()">
+        <option value="all">Qualquer preço</option>
+        <option value="0-2000">Até 2.000 Kz</option>
+        <option value="2000-5000">2.000 — 5.000 Kz</option>
+        <option value="5000-10000">5.000 — 10.000 Kz</option>
+        <option value="10000-99999">Acima de 10.000 Kz</option>
+      </select>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+  </div>
+
+  <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: SERVICES
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-services" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-breadcrumb"><span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span><span style="margin:0 6px;color:var(--border)">/</span><span>Serviços</span></div>
+      <h1>Os Nossos Serviços</h1>
+      <p>Soluções completas e integradas para o seu negócio crescer com eficiência e sem preocupações.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <img src="ENTREGA.jpg" alt="Entrega ao Domicílio" loading="lazy">
+          <div class="service-body">
+            <div class="service-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+            <h3>Entrega ao Domicílio</h3>
+            <p>Entregamos em toda Luanda em até 24h úteis. Pedidos acima de 5.000 Kz têm entrega gratuita para zonas centrais. Rastreamento em tempo real via WhatsApp.</p>
+            <a href="https://wa.me/244934707745?text=Olá! Gostaria de informações sobre entregas ao domicílio." target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Solicitar entrega</a>
+          </div>
+        </div>
+        <div class="service-card reveal d1">
+          <img src="CORPOTATIVO.jpeg" alt="Fornecimento Corporativo" loading="lazy">
+          <div class="service-body">
+            <div class="service-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="var(--b500)" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <h3>Fornecimento Corporativo</h3>
+            <p>Contratos mensais de fornecimento para empresas e escritórios. Preços especiais por volume, faturas mensais e gestor de conta dedicado para a sua empresa.</p>
+            <a href="https://wa.me/244934707745?text=Olá! Tenho interesse em fornecimento corporativo para a minha empresa." target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm">Pedir orçamento</a>
+          </div>
+        </div>
+        <div class="service-card reveal">
+          <img src="stock.jpg" alt="Consultoria de Stock" loading="lazy">
+          <div class="service-body">
+            <div class="service-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="1.8"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg></div>
+            <h3>Consultoria de Stock</h3>
+            <p>Analisamos as necessidades da sua empresa e criamos um plano de abastecimento para optimizar custos, evitar rupturas e melhorar a gestão de inventário.</p>
+            <a href="mailto:info@aquigarcia.com" class="btn btn-primary btn-sm">Saber mais</a>
+          </div>
+        </div>
+        <div class="service-card reveal d1">
+          <img src="imagens/wr.jpg" alt="Kits Personalizados" loading="lazy">
+          <div class="service-body">
+            <div class="service-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="var(--b500)" stroke-width="1.8"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+            <h3>Kits Personalizados</h3>
+            <p>Kits de materiais sob medida para eventos, inaugurações ou brindes corporativos. Embalagem personalizada com a sua marca incluída no preço.</p>
+            <a href="https://wa.me/244934707745?text=Olá! Gostaria de encomendar kits personalizados." target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm">Encomendar kit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: CURIOSITIES
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-curiosities" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-breadcrumb"><span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span><span style="margin:0 6px;color:var(--border)">/</span><span>Curiosidades</span></div>
+      <h1>Curiosidades & Dicas</h1>
+      <p>Factos que vão mudar a forma como gere o seu negócio — e impulsos para agir hoje mesmo.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="curio-grid" id="curiositiesGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: FEEDBACK
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-feedback" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-breadcrumb"><span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span><span style="margin:0 6px;color:var(--border)">/</span><span>Feedback</span></div>
+      <h1>Feedback & Sugestões</h1>
+      <p>A sua opinião molda o nosso catálogo. Diga-nos o que precisa!</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="feedback-layout">
+        <div class="feedback-info reveal-left">
+          <h2>Ajude-nos a melhorar</h2>
+          <p>O seu feedback é o motor de melhoria da AquiGarcia. Queremos saber o que pensa dos nossos produtos, serviços e o que podemos acrescentar ao catálogo.</p>
+          <div class="feedback-perks">
+            <div class="fb-perk">
+              <div class="perk-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-3c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg></div>
+              <div class="perk-text"><h4>Sugira novos produtos</h4><p>Diga-nos o que falta no catálogo e procuraremos incluí-lo.</p></div>
+            </div>
+            <div class="fb-perk">
+              <div class="perk-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div class="perk-text"><h4>Avalie a qualidade</h4><p>O seu testemunho ajuda-nos a manter padrões elevados.</p></div>
+            </div>
+            <div class="fb-perk">
+              <div class="perk-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+              <div class="perk-text"><h4>Partilhe a sua experiência</h4><p>As suas sugestões inspiram outros clientes e melhoram o serviço.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="feedback-form-card reveal-right">
+          <form id="feedbackForm" onsubmit="handleFeedback(event)">
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input class="form-input" type="text" id="fbName" required placeholder="O seu nome completo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="fbEmail" required placeholder="nome@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Avaliação geral</label>
+              <div class="star-rating" id="starRating">
+                <button type="button" class="star-btn" onclick="setRating(1)">★</button>
+                <button type="button" class="star-btn" onclick="setRating(2)">★</button>
+                <button type="button" class="star-btn" onclick="setRating(3)">★</button>
+                <button type="button" class="star-btn" onclick="setRating(4)">★</button>
+                <button type="button" class="star-btn" onclick="setRating(5)">★</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de feedback</label>
+              <select class="form-input" id="fbType">
+                <option value="produto">Sugestão de produto</option>
+                <option value="qualidade">Qualidade do serviço</option>
+                <option value="entrega">Entrega e logística</option>
+                <option value="preco">Preços</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mensagem</label>
+              <textarea class="form-input form-textarea" id="fbMsg" required placeholder="Partilhe os seus pensamentos, sugestões ou o que gostaria de ver melhorado..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="fbBtn">Enviar Feedback</button>
+          </form>
+          <div id="fbSuccess" class="success-box" style="display:none">
+            <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <h3>Obrigado pelo seu feedback!</h3>
+            <p>Vamos analisar com atenção e trabalhar para melhorar continuamente.</p>
+            <button class="btn btn-outline" style="margin-top:16px" onclick="resetFeedback()">Enviar outro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: ABOUT
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-breadcrumb"><span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span><span style="margin:0 6px;color:var(--border)">/</span><span>Sobre Nós</span></div>
+      <h1>Sobre a AquiGarcia</h1>
+      <p>A nossa história, missão e os valores que nos guiam todos os dias.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="grid-2" style="align-items:center;gap:60px">
+        <div class="reveal-left">
+          <!--
+            PLACEHOLDER FOTO SOBRE NÓS
+            Substitua: <img src="SUA_FOTO.jpg" alt="Equipa" class="about-img">
+          -->
+          <img src="1777518178412.jpg" alt="Equipa AquiGarcia" class="about-img" loading="lazy">
+        </div>
+        <div class="about-content reveal-right">
+          <div class="sec-tag">A Nossa História</div>
+          <h2>Servir Luanda com excelência</h2>
+          <p>A AquiGarcia nasceu da vontade de oferecer aos negócios de Luanda um fornecedor de confiança: preços transparentes, entrega rápida e produtos de qualidade comprovada.</p>
+          <p>Hoje fornecemos escritórios, empresas, escolas, condomínios e famílias em toda a capital angolana. O nosso compromisso é simples: chegar até si com o produto certo, na hora certa e ao melhor preço.</p>
+          <div class="about-values">
+            <div class="about-value"><div class="av-dot"></div><div class="av-text"><strong>Qualidade garantida</strong><span>Selecionamos apenas fornecedores certificados e testamos cada lote.</span></div></div>
+            <div class="about-value"><div class="av-dot"></div><div class="av-text"><strong>Prazos rigorosos</strong><span>Compromisso de entrega em 24h em toda Luanda, sem exceções.</span></div></div>
+            <div class="about-value"><div class="av-dot"></div><div class="av-text"><strong>Preços transparentes</strong><span>Sem taxas escondidas. O preço que vê é o preço que paga.</span></div></div>
+            <div class="about-value"><div class="av-dot"></div><div class="av-text"><strong>Suporte humano</strong><span>Equipa real, disponível de seg a sab, responde em menos de 2h.</span></div></div>
+          </div>
+
+          <!-- ADMIN GATE -->
+          <div class="admin-gate" id="adminGate">
+            <p>Área reservada para gestores do catálogo</p>
+            <button class="admin-gate-btn" onclick="openAdminModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Aceder ao Painel de Gestão
+            </button>
+          </div>
+
+          <!-- ADMIN PANEL -->
+          <div id="adminPanelWrap" class="admin-panel-wrap">
+            <div class="admin-panel">
+              <div class="admin-panel-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M17.66 17.66l-1.41-1.41M6.34 6.34L4.93 4.93"/></svg>
+                <h4>Gerir Catálogo de Produtos</h4>
+              </div>
+            <form id="adminProductForm" class="admin-form" onsubmit="handleProductSubmit(event)">
+  <input type="hidden" id="editProductId">
+  <input type="hidden" id="pImageAtual">
+
+  <div class="form-group">
+    <label class="form-label">Nome do produto</label>
+    <input class="form-input" type="text" id="pName" required placeholder="Ex: Papel A4 500 folhas">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Categoria</label>
+    <select class="form-input" id="pCat" required>
+      <option value="">Selecione...</option>
+      <option value="escritorio">Material de Escritório</option>
+      <option value="alimenticios">Alimentícios</option>
+      <option value="higienizacao">Higienização</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Preço (Kz)</label>
+    <input class="form-input" type="number" id="pPrice" required min="0" placeholder="Ex: 3500">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Stock (unidades)</label>
+    <input class="form-input" type="number" id="pStock" required min="0" placeholder="Ex: 50">
+  </div>
+
+  <div class="form-group span2">
+    <label class="form-label">Descrição do Produto</label>
+    <textarea class="form-input" id="pDesc" rows="2" placeholder="Descreva o produto brevemente..." style="resize:vertical;min-height:70px"></textarea>
+  </div>
+
+  <div class="form-group span2">
+    <label class="form-label">Imagem do Produto</label>
+    <input class="form-input" type="file" id="pImage" accept="image/*">
+    <small style="color:#94a3b8">Deixe vazio para manter a imagem atual ao editar</small>
+  </div>
+
+  <div class="form-group span2" style="display:flex;gap:8px">
+    <button type="submit" class="btn" id="pSaveBtn">Adicionar Produto</button>
+    <button type="button" class="btn" id="pCancelBtn" onclick="cancelProductEdit()" style="display:none;background:#64748b">Cancelar</button>
+  </div>
+</form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: CONTACT
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-breadcrumb"><span onclick="navigateTo('home')" style="cursor:pointer;color:var(--g600)">Início</span><span style="margin:0 6px;color:var(--border)">/</span><span>Contacto</span></div>
+      <h1>Contacte-nos</h1>
+      <p>Estamos disponíveis para si. Encontre-nos, fale connosco.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="contact-layout">
+       
+          <div class="contact-card">
+            <div class="c-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="var(--b500)" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div class="c-info"><h4>Telefone / WhatsApp</h4><a href="tel:+244934707745">+244 934 707 745</a></div>
+          </div>
+          <div class="contact-card">
+            <div class="c-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div class="c-info"><h4>Email</h4><a href="mailto:vendas@aquigarcia.com">vendas@aquigarcia.com</a>              <a href="mailto:info@aquigarcia.com" style="margin-top:4px">info@aquigarcia.com</a></div>
+          </div>
+          <div class="contact-card">
+            <div class="c-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="var(--b500)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="c-info"><h4>Horário de Atendimento</h4><p>Segunda a Sexta: 08h00 — 18h00<br>Sábado: 08h00 — 13h00<br>Domingo: Encerrado</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="c-icon green" style="background:#fff0f3"><svg viewBox="0 0 24 24" style="width:21px;height:21px" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg></div>
+            <div class="c-info"><h4>WhatsApp</h4><a href="https://wa.me/244934707745" target="_blank" rel="noopener noreferrer" style="color:#25D366">+244 934 707 745 — Fale agora</a></div>
+             <div class="c-info"><h4>WhatsApp</h4><a href="https://wa.me/244934707756" target="_blank" rel="noopener noreferrer" style="color:#25D366">+244 934 707 756 — Fale agora</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-top">
+    <!-- LOGO FOOTER: substitua .logo-icon por <img src="SEU_LOGO.png"> -->
+    <div>
+      <div class="logo" onclick="navigateTo('home')" style="cursor:pointer">
+        <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/></svg></div>
+        <span class="logo-name" style="color:white">Aqui<span>Garcia</span></span>
+      </div>
+      <p>O seu fornecedor de confiança em Luanda para materiais de escritório, produtos alimentícios e soluções de higienização profissional.</p>
+      <div class="footer-social">
+       <a href="https://www.facebook.com/profile.php?id=61586181054339"  target="_blank" rel="noopener noreferrer" class="social-btn" class="social-btn" title="Facebook"> <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></button></a>
+       <a href="https://www.instagram.com/aquigarcia.lda?igsh=MW45ZTVkMXNiYWJhZg=="  target="_blank" rel="noopener noreferrer" class="social-btn" class="social-btn" title="Facebook"> <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="https://wa.me/244934707745" target="_blank" rel="noopener noreferrer" class="social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1.26h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <button onclick="navigateTo('home')">Início</button>
+      <button onclick="navigateTo('products')">Produtos</button>
+      <button onclick="navigateTo('services')">Serviços</button>
+      <button onclick="navigateTo('curiosities')">Curiosidades</button>
+      <button onclick="navigateTo('feedback')">Feedback</button>
+      <button onclick="navigateTo('about')">Sobre Nós</button>
+      <button onclick="navigateTo('contact')">Contacto</button>
+    </div>
+    <div class="footer-col">
+      <h4>Categorias</h4>
+      <button onclick="navigateTo('products');filterCategory('escritorio')">Material de Escritório</button>
+      <button onclick="navigateTo('products');filterCategory('alimenticios')">Alimentícios</button>
+      <button onclick="navigateTo('products');filterCategory('higienizacao')">Higienização</button>
+    </div>
+    <div class="footer-col">
+      <h4>Contactos</h4>
+      <a href="tel:+244934707745">+244 934 707 745</a>
+      <a href="tel:+244934707745">+244 934 707 756</a>
+      <a href="mailto:vendas@aquigarcia.com">vendas@aquigarcia.com</a>
+
+      <a href="mailto:info@aquigarcia.com">info@aquigarcia.com</a>
+    
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <p>© 2026 AquiGarcia. Todos os direitos reservados.</p>
+  
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+   
+<script>
+'use strict';
+
+/* ── STATE ── */
+let cart       = [];
+let products   = [];
+let isAdmin    = false;
+let authMode   = 'login';
+let currRating = 5;
+
+/* ── PRODUCT DATA ── */
+const defaultProducts = /*__PRODUCTS_START__*/
+[
+  {
+    "id": "1777968084118",
+    "name": "Resma Navigator A3",
+    "category": "escritorio",
+    "price": 13540,
+    "stock": 100,
+    "desc": "Resma Navigator A3",
+    "img": "/imagens/1778060371046-281026453.jpg"
+  },
+  {
+    "id": "1778060257937",
+    "name": "Resma folhas A4",
+    "category": "escritorio",
+    "price": 6230,
+    "stock": 100,
+    "desc": "Resma folhas A4",
+    "img": "/imagens/1778060255090-204070637.jpg"
+  },
+  {
+    "id": "1778060258253",
+    "name": "Agrafador Alikate",
+    "category": "escritorio",
+    "price": 6185,
+    "stock": 100,
+    "desc": "Agrafador Alikate",
+    "img": "/imagens/1778060428735-685784898.jpg"
+  },
+  {
+    "id": "1778060555280",
+    "name": "Agrafador Médio",
+    "category": "escritorio",
+    "price": 4780,
+    "stock": 100,
+    "desc": "Agrafador ",
+    "img": "/imagens/1778060555232-510894349.jpg"
+  },
+  {
+    "id": "1778060604484",
+    "name": "AGRAFADOR PEQUENO GEST",
+    "category": "escritorio",
+    "price": 2670,
+    "stock": 100,
+    "desc": "Agrafador pequeno",
+    "img": "/imagens/1778060604462-802778229.jpg"
+  },
+  {
+    "id": "1778060722397",
+    "name": "Grampo Agrafador Nº 10",
+    "category": "escritorio",
+    "price": 442,
+    "stock": 100,
+    "desc": "Caixa de grampo Agrafador Nº 10 Absn",
+    "img": "/imagens/1778060722368-834736539.jpg"
+  },
+  {
+    "id": "1778060806590",
+    "name": "Caixa de grampo Agrafador 24/6",
+    "category": "escritorio",
+    "price": 540,
+    "stock": 100,
+    "desc": "Caixa de grampo Agrafador 24/6",
+    "img": "/imagens/1778060806565-385179815.jpg"
+  },
+  {
+    "id": "1778060902149",
+    "name": "Pioneses",
+    "category": "escritorio",
+    "price": 1330,
+    "stock": 100,
+    "desc": "pioneses alfinetes ",
+    "img": "/imagens/1778060902105-691581014.jpg"
+  },
+  {
+    "id": "1778060902155",
+    "name": "Furador médio",
+    "category": "escritorio",
+    "price": 7068,
+    "stock": 100,
+    "desc": "Furador médio de papel",
+    "img": "/imagens/1778062295687-33958366.jpg"
+  },
+  {
+    "id": "1778060953469",
+    "name": "POST IT SIMPLES GRANDE MULTI COLOR",
+    "category": "escritorio",
+    "price": 2660,
+    "stock": 100,
+    "desc": "POST IT SIMPLES GRANDE MULTI COLOR",
+    "img": "/imagens/1778060953423-41177180.jpg"
+  },
+  {
+    "id": "1778061056707",
+    "name": "Stick Notes 76x126mm",
+    "category": "escritorio",
+    "price": 1060,
+    "stock": 100,
+    "desc": "POST IT SIMPLES GRANDE MULTI COLOR",
+    "img": "/imagens/1778061056665-969235354.jpg"
+  },
+  {
+    "id": "1778061102534",
+    "name": "Resma Mica 100unit",
+    "category": "escritorio",
+    "price": 6750,
+    "stock": 100,
+    "desc": "Resma Mica 100unit",
+    "img": "/imagens/1778061102461-749630368.jpg"
+  },
+  {
+    "id": "1778061169115",
+    "name": "Calculadora 12dg",
+    "category": "escritorio",
+    "price": 7068,
+    "stock": 100,
+    "desc": "Calculadora 12dg",
+    "img": "/imagens/1778061169041-482199578.jpg"
+  },
+  {
+    "id": "1778061507589",
+    "name": "Cesta De Lixo De Escritório",
+    "category": "escritorio",
+    "price": 7068,
+    "stock": 100,
+    "desc": "Cesta De Lixo De Escritório médio",
+    "img": "/imagens/1778061507575-904074209.jpg"
+  },
+  {
+    "id": "1778061737333",
+    "name": "Caixa de clipe",
+    "category": "escritorio",
+    "price": 540,
+    "stock": 100,
+    "desc": "caixa de clipe prendedor de papel",
+    "img": "/imagens/1778061737328-434211963.jpg"
+  },
+  {
+    "id": "1778061856828",
+    "name": "Cola Branca",
+    "category": "escritorio",
+    "price": 885,
+    "stock": 100,
+    "desc": "Cola Branca de papel ",
+    "img": "/imagens/1778061850248-146006784.jpg"
+  },
+  {
+    "id": "1778061946972",
+    "name": "Corretor de caneta",
+    "category": "escritorio",
+    "price": 800,
+    "stock": 100,
+    "desc": "corretor de caneta",
+    "img": "/imagens/1778061946959-61469111.jpg"
+  },
+  {
+    "id": "1778062015945",
+    "name": "Envelope A4 castanho",
+    "category": "escritorio",
+    "price": 6365,
+    "stock": 100,
+    "desc": "Envelope A4 castanho",
+    "img": "/imagens/1778062015935-80311685.jpg"
+  },
+  {
+    "id": "1778062095233",
+    "name": "Conj. de Canetas",
+    "category": "escritorio",
+    "price": 6715,
+    "stock": 100,
+    "desc": "Conj. de Canetas",
+    "img": "/imagens/1778062094767-854007573.jpg"
+  },
+  {
+    "id": "1778062230820",
+    "name": "Caixa de lapiseira Bravo",
+    "category": "escritorio",
+    "price": 5635,
+    "stock": 102,
+    "desc": "Caixa de lapiseira Bravo",
+    "img": "/imagens/1778062230792-722907241.jpg"
+  },
+  {
+    "id": "1778062351024",
+    "name": "LAPIS DE COR ",
+    "category": "escritorio",
+    "price": 2052,
+    "stock": 100,
+    "desc": "LAPIS DE COR COM ESTOJO 24",
+    "img": "/imagens/1778062351008-281721589.jpg"
+  },
+  {
+    "id": "1778062404270",
+    "name": "Sublinhador Florescente",
+    "category": "escritorio",
+    "price": 513,
+    "stock": 100,
+    "desc": "sublinhador colorido florescente",
+    "img": "/imagens/1778062404248-192696505.jpg"
+  },
+  {
+    "id": "1778062473955",
+    "name": "Bandeja 3 Andares",
+    "category": "escritorio",
+    "price": 11630,
+    "stock": 100,
+    "desc": "Organizador De Mesa De Escritório",
+    "img": "/imagens/1778062473873-219641597.jpg"
+  },
+  {
+    "id": "1778062518929",
+    "name": "PASTA DE DESPACHO",
+    "category": "escritorio",
+    "price": 4155,
+    "stock": 100,
+    "desc": "PASTA DE DESPACHO",
+    "img": "/imagens/1778062518907-859544019.jpg"
+  },
+  {
+    "id": "1778062589563",
+    "name": "Porta Caneta Metálica - Circular",
+    "category": "escritorio",
+    "price": 1850,
+    "stock": 100,
+    "desc": "Porta Caneta Metálica - Circular",
+    "img": "/imagens/1778062589550-548017550.jpg"
+  },
+  {
+    "id": "1778062686261",
+    "name": "Porta caneta Multifuncional",
+    "category": "escritorio",
+    "price": 4420,
+    "stock": 100,
+    "desc": "Porta caneta Multifuncional",
+    "img": "/imagens/1778062686249-543785197.jpg"
+  },
+  {
+    "id": "1778062748836",
+    "name": "Prancheta de Madeira",
+    "category": "escritorio",
+    "price": 2150,
+    "stock": 100,
+    "desc": "Prancheta de Madeira",
+    "img": "/imagens/1778062748827-507688108.jpg"
+  },
+  {
+    "id": "1778062805307",
+    "name": "Régua Branca 30 Cm",
+    "category": "escritorio",
+    "price": 360,
+    "stock": 100,
+    "desc": "régua 30cm",
+    "img": "/imagens/1778062805294-682433682.jpg"
+  },
+  {
+    "id": "1778062839345",
+    "name": "Régua - 50 Cm",
+    "category": "escritorio",
+    "price": 1390,
+    "stock": 100,
+    "desc": "régua 50cm",
+    "img": "/imagens/1778062839114-466089528.jpg"
+  },
+  {
+    "id": "1778062919278",
+    "name": "Saca Agrafos",
+    "category": "escritorio",
+    "price": 800,
+    "stock": 100,
+    "desc": "removedor de agrafos",
+    "img": "/imagens/1778062919258-497569519.jpg"
+  },
+  {
+    "id": "1778062997772",
+    "name": "Rolo Térmico TPA",
+    "category": "escritorio",
+    "price": 390,
+    "stock": 100,
+    "desc": "Rolo de papel Térmico TPA",
+    "img": "/imagens/1778062997747-362658183.jpg"
+  },
+  {
+    "id": "1778063131868",
+    "name": "Toner Hp W11060 Preto",
+    "category": "escritorio",
+    "price": 92550,
+    "stock": 100,
+    "desc": "tonner",
+    "img": "/imagens/1778063131840-121995477.jpg"
+  },
+  {
+    "id": "1778063201704",
+    "name": "Toner Hp 207A - Preto",
+    "category": "escritorio",
+    "price": 133930,
+    "stock": 100,
+    "desc": "Toner Hp 207A - Preto",
+    "img": "/imagens/1778063201699-968705261.jpg"
+  },
+  {
+    "id": "1778063256850",
+    "name": "Toner Hp 207A - Azul",
+    "category": "escritorio",
+    "price": 142685,
+    "stock": 100,
+    "desc": "Toner Hp 207A - Azul",
+    "img": "/imagens/1778063256832-667619378.jpg"
+  },
+  {
+    "id": "1778063295148",
+    "name": "Toner Hp 207A - Amarelo",
+    "category": "escritorio",
+    "price": 142685,
+    "stock": 100,
+    "desc": "Toner Hp 207A - Amarelo",
+    "img": "/imagens/1778063295130-34983675.jpg"
+  },
+  {
+    "id": "1778063369848",
+    "name": "Toner Hp 207A - magenta",
+    "category": "escritorio",
+    "price": 142685,
+    "stock": 100,
+    "desc": "Toner Hp 207A - magenta",
+    "img": "/imagens/1778063369818-268521774.jpg"
+  },
+  {
+    "id": "1778063438800",
+    "name": "Tonner  HP 83A",
+    "category": "escritorio",
+    "price": 135300,
+    "stock": 100,
+    "desc": "Toner Hp 83A",
+    "img": "/imagens/1778063438786-485516928.jpg"
+  },
+  {
+    "id": "1778063896828",
+    "name": "Toner Hp 210A -preto",
+    "category": "escritorio",
+    "price": 146400,
+    "stock": 100,
+    "desc": "Toner Hp 210A -preto",
+    "img": "/imagens/1778063896821-437336843.jpg"
+  },
+  {
+    "id": "1778063989914",
+    "name": "Tonner  HP 211A",
+    "category": "escritorio",
+    "price": 183450,
+    "stock": 100,
+    "desc": "Tonner  HP 211A",
+    "img": "/imagens/1778063989909-65982701.jpg"
+  },
+  {
+    "id": "1778064097456",
+    "name": "Tomate Pelado",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "Tomate Pelado",
+    "img": "/imagens/1778064097433-739982457.jpg"
+  },
+  {
+    "id": "1778064123061",
+    "name": "Salada de Frutas",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "Salada de Frutas",
+    "img": "/imagens/1778064123050-19225915.jpg"
+  },
+  {
+    "id": "1778064144082",
+    "name": "Atum em lata",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "Atum em lata",
+    "img": "/imagens/1778064144037-525165349.jpg"
+  },
+  {
+    "id": "1778064174014",
+    "name": "Pera Fatias",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "(atualizando...)",
+    "img": "/imagens/1778064173993-450141900.jpg"
+  },
+  {
+    "id": "1778064218284",
+    "name": "salsichas",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando...",
+    "img": "/imagens/1778064218271-635404628.jpg"
+  },
+  {
+    "id": "1778064276227",
+    "name": "atualizando nome...",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 100,
+    "desc": "atualizando nome...",
+    "img": "/imagens/1778064276217-763611206.jpg"
+  },
+  {
+    "id": "1778064310582",
+    "name": "kit cestabásica completo",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando...",
+    "img": "/imagens/1778064310559-184782661.jpg"
+  },
+  {
+    "id": "1778064338724",
+    "name": "Omo ultra",
+    "category": "higienizacao",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando",
+    "img": "/imagens/1778064338689-799419418.jpg"
+  },
+  {
+    "id": "1778064374066",
+    "name": "Ama Amaciador  650 Ml* 12",
+    "category": "higienizacao",
+    "price": 0,
+    "stock": 100,
+    "desc": "atualizando...",
+    "img": "/imagens/1778064374059-164251541.jpg"
+  },
+  {
+    "id": "1778064427233",
+    "name": "Desenfectante ultra",
+    "category": "higienizacao",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando",
+    "img": "/imagens/1778064427225-37649028.jpg"
+  },
+  {
+    "id": "1778064466717",
+    "name": "Péssego em Lata",
+    "category": "alimenticios",
+    "price": 1,
+    "stock": 1,
+    "desc": "atualizando",
+    "img": "/imagens/1778064466706-856309410.jpg"
+  },
+  {
+    "id": "1778064514260",
+    "name": "Omo ultra unit",
+    "category": "higienizacao",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando...",
+    "img": "/imagens/1778064514176-900835061.jpg"
+  },
+  {
+    "id": "1778064707372",
+    "name": "atualizando nome...",
+    "category": "alimenticios",
+    "price": 0,
+    "stock": 0,
+    "desc": "atualizando nome...",
+    "img": "/imagens/1778064707358-604201037.jpg"
+  }
+]
+/*__PRODUCTS_END__*/;
+const catLabel = {escritorio:'Escritório',alimenticios:'Alimentícios',higienizacao:'Higienização'};
+const catImgFallback = {
+  escritorio:'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=400&q=80&fit=crop',
+  alimenticios:'https://images.unsplash.com/photo-1506617564039-2f3b650b7010?w=400&q=80&fit=crop',
+  higienizacao:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400&q=80&fit=crop',
+};
+
+/* ── CURIOSITIES DATA ── */
+const curiosities = [
+  {icon:'M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z',color:'green',title:'Escritório organizado = 40% mais produtividade',desc:'Estudos da Harvard Business Review confirmam que ambientes organizados com materiais à mão aumentam a produtividade da equipa em até 40%. Os materiais certos fazem toda a diferença.',cat:'escritorio'},
+  {icon:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',color:'blue',title:'Ambientes limpos reduzem doenças em 60%',desc:'Produtos de higienização profissional reduzem a propagação de vírus e bactérias no escritório em 60%. Equipa saudável é equipa produtiva — sem baixas médicas.',cat:'higienizacao'},
+  {icon:'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',color:'green',title:'Compra em volume poupa até 35% nos custos',desc:'Empresas que planeiam compras mensais em quantidade reduzem os custos de aprovisionamento em até 35% face às compras pontuais. A AquiGarcia tem preços especiais para volume.',cat:'escritorio'},
+  {icon:'M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zm4-4v4m4-4v4m4-4v4',color:'orange',title:'Snacks no escritório aumentam satisfação em 67%',desc:'Um estudo da Gallup revelou que escritórios com produtos alimentícios disponíveis registam 67% mais satisfação dos colaboradores. Invista no bem-estar da sua equipa.',cat:'alimenticios'},
+  {icon:'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0-6 0',color:'blue',title:'1ª impressão: 94% é determinada pelo espaço',desc:'Clientes julgam a qualidade de um negócio pelos primeiros 7 segundos. Um escritório limpo e bem equipado transmite profissionalismo e aumenta a confiança em 94%.',cat:'higienizacao'},
+  {icon:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',color:'green',title:'96% dos clientes da AquiGarcia voltam a comprar',desc:'A taxa de retenção da AquiGarcia é de 96% — prova de que qualidade consistente e preços justos constroem relações duradouras. Junte-se a mais de 2.000 clientes satisfeitos.',cat:'escritorio'},
+  {icon:'M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01 9 11.01',color:'blue',title:'Planeamento de stock evita perdas de até 25%',desc:'Empresas sem plano de stock perdem até 25% do orçamento em compras de emergência com preços inflacionados. A AquiGarcia oferece consultoria gratuita de stock.',cat:'escritorio'},
+  {icon:'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z',color:'orange',title:'Produtos não perecíveis: segurança alimentar garantida',desc:'Manter stock de alimentos não perecíveis garante autonomia de 30 a 90 dias para o seu escritório, sem depender de entregas diárias. Economize tempo e dinheiro.',cat:'alimenticios'},
+  {icon:'M3 6l3 1m0 0l-3 9a5.002 5.002 0 0 0 6.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 0 0 6.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3',color:'green',title:'Higienização profissional: 3x mais eficaz',desc:'Produtos de higienização profissional são 3 vezes mais eficazes que os domésticos a preços similares. O retorno é imediato: menos tempo de limpeza, melhores resultados.',cat:'higienizacao'},
+];
+
+/* ── INIT ── */
+(async function init() {
+  await loadProductsFromServer();
+  renderProducts();
+  renderCuriosities();
+  setRating(5);
+  setupScrollReveal();
+  setupHeaderScroll();
+  if (window.dataSdk) {
+    window.dataSdk.init({onDataChanged(){}}).catch(()=>{});
+  }
+  if (window.elementSdk) {
+    window.elementSdk.init({
+      defaultConfig:{},
+      onConfigChange:()=>{},
+      mapToCapabilities:()=>({recolorables:[],borderables:[]}),
+      mapToEditPanelValues:()=>new Map()
+    });
+  }
+})();
+
+/* ── NAVIGATION ── */
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (page === 'products') renderProducts();
+  if (page === 'curiosities') renderCuriosities();
+}
+
+function filterCategory(cat) {
+  setTimeout(() => {
+    const f = document.getElementById('catFilter');
+    if (f) { f.value = cat; renderProducts(); }
+  }, 80);
+}
+
+/* ── MOBILE NAV ── */
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const ham = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  ham.classList.toggle('open');
+}
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+/* ── HEADER SCROLL ── */
+function setupHeaderScroll() {
+  window.addEventListener('scroll', () => {
+    document.getElementById('header').classList.toggle('scrolled', window.scrollY > 20);
+  });
+}
+
+/* ── SCROLL REVEAL ── */
+function setupScrollReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
+}
+
+/* ── PRODUCTS RENDER ── */
+function renderProducts() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const cat    = document.getElementById('catFilter')?.value    || 'all';
+  const sort   = document.getElementById('sortFilter')?.value   || 'name-asc';
+  const price  = document.getElementById('priceFilter')?.value  || 'all';
+
+  let filtered = products.filter(p => {
+    if (cat !== 'all' && p.category !== cat) return false;
+    if (search && !p.name.toLowerCase().includes(search) && !p.desc.toLowerCase().includes(search)) return false;
+    if (price !== 'all') {
+      const [min, max] = price.split('-').map(Number);
+      if (p.price < min || p.price > max) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    switch(sort) {
+      case 'name-desc':   return b.name.localeCompare(a.name);
+      case 'price-asc':   return a.price - b.price;
+      case 'price-desc':  return b.price - a.price;
+      case 'stock-desc':  return b.stock - a.stock;
+      default:            return a.name.localeCompare(b.name);
+    }
+  });
+
+  const cntEl = document.getElementById('resultsCount');
+  if (cntEl) cntEl.textContent = `${filtered.length} produto${filtered.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p style="font-size:1.05rem;font-weight:700;color:var(--ink3);margin-bottom:6px">Nenhum produto encontrado</p><p style="font-size:.875rem">Tente outros termos ou remova alguns filtros.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => {
+    const stockClass = p.stock < 20 ? 'stock-low' : '';
+    const stockLabel = p.stock < 10 ? `Apenas ${p.stock} em stock` : p.stock < 20 ? `${p.stock} unidades` : `Em stock (${p.stock})`;
+    return `
+    <div class="product-card" data-id="${p.id}">
+      <div class="product-img-wrap">
+        <img class="product-img" src="${p.img || catImgFallback[p.category]}" alt="${p.name}" loading="lazy"
+          onerror="this.src='${catImgFallback[p.category]}'">
+        <span class="product-cat-tag">${catLabel[p.category]}</span>
+        <button class="product-wishlist" title="Guardar" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-meta">
+          <div class="product-price"><small>Preço</small>${p.price.toLocaleString('pt-AO')} Kz</div>
+          <div class="product-stock ${stockClass}"><span class="stock-dot"></span>${stockLabel}</div>
+        </div>
+        <div class="product-footer">
+          <button class="btn-add-cart" onclick="addToCart('${p.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar
+          </button>
+          <a href="https://wa.me/244934707745?text=Olá! Gostaria de encomendar: *${encodeURIComponent(p.name)}* — ${p.price.toLocaleString('pt-AO')} Kz. Aguardo informações." target="_blank" rel="noopener noreferrer" class="btn-product-wa" title="Encomendar via WhatsApp">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.942 9.942 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+          </a>
+        </div>
+        ${isAdmin ? `<div class="admin-controls show">
+          <button class="btn-edit-p" onclick="startEditProduct('${p.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar
+          </button>
+          <button class="btn-del-p" onclick="deleteProduct('${p.id}',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Remover
+          </button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Re-run reveal for dynamically created cards
+  setTimeout(setupScrollReveal, 50);
+}
+
+/* ── ADMIN PRODUCT CRUD ── */
+/* ── ADMIN PRODUCT CRUD ── */
+async function handleProductSubmit(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('editProductId').value;
+  const cat = document.getElementById('pCat').value;
+  const name = document.getElementById('pName').value;
+  const fileInput = document.getElementById('pImage');
+
+  // Se não escolher foto nova, usa a que já tava
+  let imgPath = document.getElementById('pImageAtual').value || '';
+
+  // Se escolheu foto nova, faz upload
+  if (fileInput.files && fileInput.files[0]) {
+    try {
+      const resp = await fetch('/upload', {
+        method: 'POST',
+        body: fileInput.files[0]
+      });
+
+      const dados = await resp.json();
+
+      if (dados.ok) {
+        imgPath = dados.url;
+      } else {
+        showToast('Erro no upload: ' + dados.error, 'error');
+        return;
+      }
+    } catch (err) {
+      showToast('Servidor /upload não respondeu', 'error');
+      console.error(err);
+      return;
+    }
+  }
+
+  // Salva o produto
+  await saveProduct(id, cat, name, imgPath);
+}
+
+function startEditProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('editProductId').value = p.id;
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pCat').value = p.category;
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pStock').value = p.stock;
+  document.getElementById('pImageAtual').value = p.img || '';
+  if (document.getElementById('pDesc')) document.getElementById('pDesc').value = p.desc || '';
+  document.getElementById('pSaveBtn').textContent = 'Atualizar Produto';
+  document.getElementById('pCancelBtn').style.display = 'inline-flex';
+  navigateTo('about');
+  setTimeout(() => document.getElementById('adminPanelWrap').scrollIntoView({behavior: 'smooth'}), 100);
+}
+
+function deleteProduct(id, btn) {
+  if (btn._confirming) {
+    deleteProductFromServer(id);
+  } else {
+    btn._confirming = true;
+    const orig = btn.innerHTML;
+    btn.textContent = 'Confirmar?';
+    btn.style.cssText = 'border-color:#ef4444;color:#ef4444;background:#fef2f2';
+    setTimeout(() => { btn._confirming = false; btn.innerHTML = orig; btn.style = ''; }, 3000);
+  }
+}
+
+function cancelProductEdit() { resetProductForm(); }
+function resetProductForm() {
+  document.getElementById('adminProductForm').reset();
+  document.getElementById('editProductId').value = '';
+  document.getElementById('pImageAtual').value = '';
+  if (document.getElementById('pDesc')) document.getElementById('pDesc').value = '';
+  document.getElementById('pSaveBtn').textContent = 'Adicionar Produto';
+  document.getElementById('pCancelBtn').style.display = 'none';
+}
+
+/* ── NOVAS FUNÇÕES: COLA ABAIXO DO resetProductForm() ── */
+async function saveProduct(id, cat, name, imgPath) {
+  const price = parseFloat(document.getElementById('pPrice').value) || 0;
+  const stock = parseInt(document.getElementById('pStock').value) || 0;
+
+  const desc = document.getElementById('pDesc') ? document.getElementById('pDesc').value : name;
+  const product = {
+    id: id || Date.now().toString(),
+    name: name,
+    category: cat,
+    price: price,
+    stock: stock,
+    desc: desc || name,
+    img: imgPath
+  };
+
+  try {
+    const resp = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(product)
+    });
+
+    const dados = await resp.json();
+
+    if (dados.ok) {
+      showToast(id? 'Produto atualizado!' : 'Produto adicionado!', 'success');
+      await loadProductsFromServer();
+      renderProducts();
+      resetProductForm();
+    } else {
+      showToast('Erro ao salvar: ' + dados.error, 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Erro de conexão com servidor', 'error');
+  }
+}
+
+async function loadProductsFromServer() {
+  try {
+    const resp = await fetch('/api/products');
+    const dados = await resp.json();
+    if (dados.ok) {
+      products = dados.products;
+    }
+  } catch (err) {
+    console.error('Erro ao carregar produtos:', err);
+  }
+}
+
+async function deleteProductFromServer(id) {
+  try {
+    const resp = await fetch('/api/products/' + id, { method: 'DELETE' });
+    const dados = await resp.json();
+    if (dados.ok) {
+      showToast('Produto removido!', 'success');
+      await loadProductsFromServer();
+      renderProducts();
+    }
+  } catch (err) {
+    showToast('Erro ao remover', 'error');
+  }
+}
+
+function deleteProduct(id, btn) {
+  if (btn._confirming) {
+    products = products.filter(p => p.id !== id);
+    showToast('Produto removido!', 'success');
+    renderProducts();
+  } else {
+    btn._confirming = true;
+    const orig = btn.innerHTML;
+    btn.textContent = 'Confirmar?';
+    btn.style.cssText = 'border-color:#ef4444;color:#ef4444;background:#fef2f2';
+    setTimeout(() => { btn._confirming = false; btn.innerHTML = orig; btn.style = ''; }, 3000);
+  }
+}
+
+function cancelProductEdit() { resetProductForm(); }
+function resetProductForm() {
+  document.getElementById('adminProductForm').reset();
+  document.getElementById('editProductId').value = '';
+  document.getElementById('pImageAtual').value = ''; //linha que eu add
+  if (document.getElementById('pDesc')) document.getElementById('pDesc').value = '';
+  document.getElementById('pSaveBtn').textContent = 'Adicionar Produto';
+  document.getElementById('pCancelBtn').style.display = 'none';
+}
+
+/* ── CART ── */
+function openCart()  { document.getElementById('cartBackdrop').classList.add('open'); document.getElementById('cartDrawer').classList.add('open'); }
+function closeCart() { document.getElementById('cartBackdrop').classList.remove('open'); document.getElementById('cartDrawer').classList.remove('open'); }
+
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  const existing = cart.find(c => c.id === id);
+  if (existing) existing.qty++;
+  else cart.push({...product, qty: 1});
+  updateCartUI();
+  showToast(`"${product.name}" adicionado ao carrinho!`, 'success');
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(c => c.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  updateCartUI();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(c => c.id !== id);
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const totalItems = cart.reduce((s, c) => s + c.qty, 0);
+  const subtotal   = cart.reduce((s, c) => s + c.price * c.qty, 0);
+
+  // Badge
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = totalItems;
+  badge.classList.toggle('show', totalItems > 0);
+
+  // Count label
+  const countLabel = document.getElementById('cartCountLabel');
+  if (countLabel) countLabel.textContent = `${totalItems} item${totalItems !== 1 ? 'ns' : ''}`;
+
+  // Summary
+  const summaryEl = document.getElementById('cartSummary');
+  if (summaryEl) {
+    summaryEl.style.display = cart.length > 0 ? 'block' : 'none';
+    const sub = document.getElementById('cartSubtotal');
+    const tot = document.getElementById('cartTotal');
+    if (sub) sub.textContent = subtotal.toLocaleString('pt-AO') + ' Kz';
+    if (tot) tot.textContent = subtotal.toLocaleString('pt-AO') + ' Kz';
+  }
+
+  // Items
+  const body = document.getElementById('cartBody');
+  if (!body) return;
+  if (cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg><p>Carrinho vazio</p><small>Adicione produtos para continuar</small></div>`;
+    return;
+  }
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <img class="cart-item-img" src="${item.img || catImgFallback[item.category]}" alt="${item.name}" loading="lazy">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${(item.price * item.qty).toLocaleString('pt-AO')} Kz</div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',+1)">+</button>
+          <button class="cart-remove" onclick="removeFromCart('${item.id}')" title="Remover">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function sendCartWhatsApp() {
+  if (cart.length === 0) { showToast('O carrinho está vazio!'); return; }
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  let msg = '🛒 *Pedido AquiGarcia*\n\n';
+  cart.forEach(item => {
+    msg += `• *${item.name}*\n`;
+    msg += `  Qty: ${item.qty}  |  Unit: ${item.price.toLocaleString('pt-AO')} Kz  |  Sub: ${(item.price * item.qty).toLocaleString('pt-AO')} Kz\n\n`;
+  });
+  msg += `─────────────────\n`;
+  msg += `💰 *TOTAL: ${total.toLocaleString('pt-AO')} Kz*\n\n`;
+  msg += `Por favor confirme disponibilidade e informações de entrega. Obrigado!`;
+  window.open('https://wa.me/244934707745?text=' + encodeURIComponent(msg), '_blank');
+}
+
+/* ── CURIOSITIES RENDER ── */
+function renderCuriosities() {
+  const grid = document.getElementById('curiositiesGrid');
+  if (!grid) return;
+  grid.innerHTML = curiosities.map((c, i) => `
+    <div class="curio-card reveal" style="animation-delay:${i * 0.06}s">
+      <div class="curio-icon ${c.color}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--${c.color === 'green' ? 'g600' : c.color === 'blue' ? 'b500' : 'orange:; stroke:#ea580c'})" stroke-width="1.8"
+          style="stroke:${c.color === 'green' ? 'var(--g600)' : c.color === 'blue' ? 'var(--b500)' : '#ea580c'}">
+          <path d="${c.icon}"/>
+        </svg>
+      </div>
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <button class="curio-cta" onclick="navigateTo('products');filterCategory('${c.cat}')">
+        Ver produtos
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>`).join('');
+  setTimeout(setupScrollReveal, 50);
+}
+
+/* ── FEEDBACK ── */
+function setRating(n) {
+  currRating = n;
+  document.querySelectorAll('#starRating .star-btn').forEach((s, i) => s.classList.toggle('active', i < n));
+}
+
+async function handleFeedback(e) {
+  e.preventDefault();
+  const btn = document.getElementById('fbBtn');
+  btn.disabled = true;
+  btn.textContent = 'A enviar...';
+  try {
+    if (window.dataSdk) {
+      await window.dataSdk.create({
+        type: 'feedback',
+        name: document.getElementById('fbName').value,
+        email: document.getElementById('fbEmail').value,
+        message: document.getElementById('fbMsg').value,
+        rating: currRating,
+        fbtype: document.getElementById('fbType').value,
+        created_at: new Date().toISOString()
+      });
+    }
+  } catch(err) {}
+  btn.disabled = false;
+  btn.textContent = 'Enviar Feedback';
+  document.getElementById('feedbackForm').style.display = 'none';
+  document.getElementById('fbSuccess').style.display = 'block';
+}
+
+function resetFeedback() {
+  document.getElementById('feedbackForm').style.display = 'block';
+  document.getElementById('feedbackForm').reset();
+  document.getElementById('fbSuccess').style.display = 'none';
+  setRating(5);
+}
+
+/* ── AUTH MODAL ── */
+function openLoginModal()  { document.getElementById('loginModalBg').classList.add('open'); }
+function closeLoginModal() { document.getElementById('loginModalBg').classList.remove('open'); }
+function switchAuthTab(tab) {
+  authMode = tab;
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabReg').classList.toggle('active', tab === 'register');
+  document.getElementById('registerExtra').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Iniciar Sessão' : 'Criar Conta';
+}
+function handleAuth() {
+  showToast(authMode === 'login' ? 'Sessão iniciada com sucesso!' : 'Conta criada com sucesso!', 'success');
+  closeLoginModal();
+}
+
+/* ── ADMIN MODAL ── */
+function openAdminModal()  { document.getElementById('adminModalBg').classList.add('open'); setTimeout(()=>document.getElementById('adminPwd').focus(),100); }
+function closeAdminModal() { document.getElementById('adminModalBg').classList.remove('open'); document.getElementById('adminPwd').value = ''; }
+function handleAdminLogin() {
+  const pwd = document.getElementById('adminPwd').value;
+  if (pwd === 'admin123') {
+    isAdmin = true;
+    closeAdminModal();
+    document.getElementById('adminPanelWrap').classList.add('active');
+    document.getElementById('adminGate').style.display = 'none';
+    showToast('Bem-vindo! Painel de gestão ativo.', 'success');
+    renderProducts();
+  } else {
+    const inp = document.getElementById('adminPwd');
+    inp.classList.add('input-error');
+    inp.classList.add('error-shake');
+    setTimeout(() => { inp.classList.remove('input-error','error-shake'); }, 1000);
+    showToast('Senha incorreta. Tente novamente.', 'error');
+  }
+}
+
+/* ── TOAST ── */
+let toastTimer;
+function showToast(msg, type = '') {
+  const t  = document.getElementById('toast');
+  const tm = document.getElementById('toastMsg');
+  tm.textContent = msg;
+  t.className = `toast${type ? ' toast-'+type : ''} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ── RIPPLE ── */
+document.querySelectorAll('.ripple-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    r.style.left = (e.offsetX - 20) + 'px';
+    r.style.top  = (e.offsetY - 20) + 'px';
+    btn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+});
+
+/* ── CLOSE MODALS ON BG CLICK ── */
+document.getElementById('loginModalBg').addEventListener('click', e => { if (e.target === e.currentTarget) closeLoginModal(); });
+document.getElementById('adminModalBg').addEventListener('click', e => { if (e.target === e.currentTarget) closeAdminModal(); });
+</script>
+</body>
+</html>

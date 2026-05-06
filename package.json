@@ -1,0 +1,18 @@
+{
+  "name": "aquigarcia",
+  "version": "1.0.0",
+  "description": "AquiGarcia - Site de E-commerce",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [],
+  "author": "AquiGarcia",
+  "license": "ISC",
+"dependencies":  {"express": "^4.18.2"
+}
+}
