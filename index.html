@@ -2207,28 +2207,20 @@ function renderProducts() {
 }
 
 /* ── ADMIN PRODUCT CRUD ── */
-/* ── ADMIN PRODUCT CRUD ── */
 async function handleProductSubmit(e) {
   e.preventDefault();
 
-  const id = document.getElementById('editProductId').value;
-  const cat = document.getElementById('pCat').value;
-  const name = document.getElementById('pName').value;
+  const id       = document.getElementById('editProductId').value;
+  const cat      = document.getElementById('pCat').value;
+  const name     = document.getElementById('pName').value;
   const fileInput = document.getElementById('pImage');
 
-  // Se não escolher foto nova, usa a que já tava
   let imgPath = document.getElementById('pImageAtual').value || '';
 
-  // Se escolheu foto nova, faz upload
   if (fileInput.files && fileInput.files[0]) {
     try {
-      const resp = await fetch('/upload', {
-        method: 'POST',
-        body: fileInput.files[0]
-      });
-
+      const resp = await fetch('/upload', { method: 'POST', body: fileInput.files[0] });
       const dados = await resp.json();
-
       if (dados.ok) {
         imgPath = dados.url;
       } else {
@@ -2242,24 +2234,23 @@ async function handleProductSubmit(e) {
     }
   }
 
-  // Salva o produto
   await saveProduct(id, cat, name, imgPath);
 }
 
 function startEditProduct(id) {
-  const p = products.find(x => x.id === id);
+  const p = products.find(x => String(x.id) === String(id));
   if (!p) return;
   document.getElementById('editProductId').value = p.id;
-  document.getElementById('pName').value = p.name;
-  document.getElementById('pCat').value = p.category;
-  document.getElementById('pPrice').value = p.price;
-  document.getElementById('pStock').value = p.stock;
-  document.getElementById('pImageAtual').value = p.img || '';
+  document.getElementById('pName').value         = p.name;
+  document.getElementById('pCat').value          = p.category;
+  document.getElementById('pPrice').value        = p.price;
+  document.getElementById('pStock').value        = p.stock;
+  document.getElementById('pImageAtual').value   = p.img || '';
   if (document.getElementById('pDesc')) document.getElementById('pDesc').value = p.desc || '';
-  document.getElementById('pSaveBtn').textContent = 'Atualizar Produto';
-  document.getElementById('pCancelBtn').style.display = 'inline-flex';
+  document.getElementById('pSaveBtn').textContent        = 'Atualizar Produto';
+  document.getElementById('pCancelBtn').style.display   = 'inline-flex';
   navigateTo('about');
-  setTimeout(() => document.getElementById('adminPanelWrap').scrollIntoView({behavior: 'smooth'}), 100);
+  setTimeout(() => document.getElementById('adminPanelWrap').scrollIntoView({behavior:'smooth'}), 100);
 }
 
 function deleteProduct(id, btn) {
@@ -2275,47 +2266,51 @@ function deleteProduct(id, btn) {
 }
 
 function cancelProductEdit() { resetProductForm(); }
+
 function resetProductForm() {
   document.getElementById('adminProductForm').reset();
   document.getElementById('editProductId').value = '';
-  document.getElementById('pImageAtual').value = '';
+  document.getElementById('pImageAtual').value   = '';
   if (document.getElementById('pDesc')) document.getElementById('pDesc').value = '';
-  document.getElementById('pSaveBtn').textContent = 'Adicionar Produto';
-  document.getElementById('pCancelBtn').style.display = 'none';
+  document.getElementById('pSaveBtn').textContent      = 'Adicionar Produto';
+  document.getElementById('pCancelBtn').style.display  = 'none';
 }
 
-/* ── NOVAS FUNÇÕES: COLA ABAIXO DO resetProductForm() ── */
+// POST = criar novo | PUT = editar existente
 async function saveProduct(id, cat, name, imgPath) {
-  const price = parseFloat(document.getElementById('pPrice').value) || 0;
-  const stock = parseInt(document.getElementById('pStock').value) || 0;
+  const price  = parseFloat(document.getElementById('pPrice').value) || 0;
+  const stock  = parseInt(document.getElementById('pStock').value, 10) || 0;
+  const desc   = document.getElementById('pDesc') ? document.getElementById('pDesc').value : name;
 
-  const desc = document.getElementById('pDesc') ? document.getElementById('pDesc').value : name;
   const product = {
-    id: id || Date.now().toString(),
-    name: name,
+    id:       id || String(Date.now()),
+    name:     name,
     category: cat,
-    price: price,
-    stock: stock,
-    desc: desc || name,
-    img: imgPath
+    price:    price,
+    stock:    stock,
+    desc:     desc || name,
+    img:      imgPath
   };
 
-  try {
-    const resp = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(product)
-    });
+  const isEdit = !!id;
+  const url    = isEdit ? '/api/products/' + id : '/api/products';
+  const method = isEdit ? 'PUT' : 'POST';
 
+  try {
+    const resp  = await fetch(url, {
+      method:  method,
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(product)
+    });
     const dados = await resp.json();
 
     if (dados.ok) {
-      showToast(id? 'Produto atualizado!' : 'Produto adicionado!', 'success');
+      showToast(isEdit ? 'Produto atualizado!' : 'Produto adicionado!', 'success');
       await loadProductsFromServer();
       renderProducts();
       resetProductForm();
     } else {
-      showToast('Erro ao salvar: ' + dados.error, 'error');
+      showToast('Erro: ' + dados.error, 'error');
     }
   } catch (err) {
     console.error(err);
@@ -2325,11 +2320,9 @@ async function saveProduct(id, cat, name, imgPath) {
 
 async function loadProductsFromServer() {
   try {
-    const resp = await fetch('/api/products');
+    const resp  = await fetch('/api/products');
     const dados = await resp.json();
-    if (dados.ok) {
-      products = dados.products;
-    }
+    if (dados.ok) products = dados.products;
   } catch (err) {
     console.error('Erro ao carregar produtos:', err);
   }
@@ -2337,40 +2330,19 @@ async function loadProductsFromServer() {
 
 async function deleteProductFromServer(id) {
   try {
-    const resp = await fetch('/api/products/' + id, { method: 'DELETE' });
+    const resp  = await fetch('/api/products/' + id, { method: 'DELETE' });
     const dados = await resp.json();
     if (dados.ok) {
       showToast('Produto removido!', 'success');
       await loadProductsFromServer();
       renderProducts();
+    } else {
+      showToast('Erro ao remover: ' + dados.error, 'error');
     }
   } catch (err) {
-    showToast('Erro ao remover', 'error');
+    showToast('Erro de conexão ao remover', 'error');
+    console.error(err);
   }
-}
-
-function deleteProduct(id, btn) {
-  if (btn._confirming) {
-    products = products.filter(p => p.id !== id);
-    showToast('Produto removido!', 'success');
-    renderProducts();
-  } else {
-    btn._confirming = true;
-    const orig = btn.innerHTML;
-    btn.textContent = 'Confirmar?';
-    btn.style.cssText = 'border-color:#ef4444;color:#ef4444;background:#fef2f2';
-    setTimeout(() => { btn._confirming = false; btn.innerHTML = orig; btn.style = ''; }, 3000);
-  }
-}
-
-function cancelProductEdit() { resetProductForm(); }
-function resetProductForm() {
-  document.getElementById('adminProductForm').reset();
-  document.getElementById('editProductId').value = '';
-  document.getElementById('pImageAtual').value = ''; //linha que eu add
-  if (document.getElementById('pDesc')) document.getElementById('pDesc').value = '';
-  document.getElementById('pSaveBtn').textContent = 'Adicionar Produto';
-  document.getElementById('pCancelBtn').style.display = 'none';
 }
 
 /* ── CART ── */
@@ -2378,9 +2350,9 @@ function openCart()  { document.getElementById('cartBackdrop').classList.add('op
 function closeCart() { document.getElementById('cartBackdrop').classList.remove('open'); document.getElementById('cartDrawer').classList.remove('open'); }
 
 function addToCart(id) {
-  const product = products.find(p => p.id === id);
+  const product = products.find(p => String(p.id) === String(id));
   if (!product) return;
-  const existing = cart.find(c => c.id === id);
+  const existing = cart.find(c => String(c.id) === String(id));
   if (existing) existing.qty++;
   else cart.push({...product, qty: 1});
   updateCartUI();
@@ -2388,15 +2360,15 @@ function addToCart(id) {
 }
 
 function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
+  const item = cart.find(c => String(c.id) === String(id));
   if (!item) return;
   item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  if (item.qty <= 0) cart = cart.filter(c => String(c.id) !== String(id));
   updateCartUI();
 }
 
 function removeFromCart(id) {
-  cart = cart.filter(c => c.id !== id);
+  cart = cart.filter(c => String(c.id) !== String(id));
   updateCartUI();
 }
 

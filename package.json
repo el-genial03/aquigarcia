@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "aquigarcia",
   "version": "1.0.0",
   "description": "AquiGarcia - Site de E-commerce",
@@ -15,9 +16,8 @@
   "author": "AquiGarcia",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
     "@supabase/supabase-js": "^2.39.0",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.5.1",
     "dotenv": "^16.3.1"
   }
 }
