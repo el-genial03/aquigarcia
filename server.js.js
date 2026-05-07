@@ -5083,16 +5083,43 @@ const defaultProducts = [
   }
 ];
 
+// ============================================================
+// DEPENDÊNCIAS — ANTES: só http, fs, path, url (built-in)
+//               DEPOIS: + Supabase + Cloudinary (nuvem)
+// ============================================================
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+// DEPOIS: carregar variáveis de ambiente do ficheiro .env
+require('dotenv').config();
+
+// DEPOIS: cliente Supabase (substitui leitura/escrita no index.html)
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+// DEPOIS: cliente Cloudinary (substitui guardar imagens em /imagens)
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
+// ANTES: const HTML_FILE = path.join(ROOT, 'index.html');
+// ANTES: const IMG_DIR = path.join(ROOT, 'imagens');
+// DEPOIS: HTML_FILE ainda serve para servir o ficheiro estático ao browser.
+//         IMG_DIR já não é usado para guardar imagens novas.
 const HTML_FILE = path.join(ROOT, 'index.html');
 const IMG_DIR = path.join(ROOT, 'imagens');
 
+// Manter a pasta /imagens para imagens antigas que ainda possam existir localmente
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
 const MIME = {
@@ -5109,6 +5136,9 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
+// ============================================================
+// FUNÇÃO: readBody — SEM ALTERAÇÕES
+// ============================================================
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -5118,6 +5148,9 @@ function readBody(req) {
   });
 }
 
+// ============================================================
+// FUNÇÃO: parseMultipart — SEM ALTERAÇÕES
+// ============================================================
 function parseMultipart(buffer, boundary) {
   const fields = {};
   const files = {};
@@ -5156,73 +5189,126 @@ function parseMultipart(buffer, boundary) {
   return { fields, files };
 }
 
-function readProductsFromHTML() {
+// ============================================================
+// FUNÇÃO: readProductsFromHTML
+// ANTES: lia os produtos do bloco /*__PRODUCTS_START__*/ no index.html
+// DEPOIS: lê os produtos da tabela "produtos" no Supabase
+// ============================================================
+async function readProductsFromHTML() {
   try {
-    const html = fs.readFileSync(HTML_FILE, 'utf8');
-    const match = html.match(/\/\*__PRODUCTS_START__\*\/([\s\S]*?)\/\*__PRODUCTS_END__\*\//);
-    if (!match) return defaultProducts;
-    return JSON.parse(match[1].trim());
+    const { data, error } = await supabase
+      .from('produtos')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      console.log('⚠️ Supabase vazio, usando defaultProducts');
+      return defaultProducts;
+    }
+    return data;
   } catch(e) {
-    console.log('⚠️ Erro lendo HTML, usando defaultProducts');
+    console.log('⚠️ Erro lendo Supabase:', e.message, '— usando defaultProducts');
     return defaultProducts;
   }
 }
 
-function writeProductsToHTML(products) {
-  let html = fs.readFileSync(HTML_FILE, 'utf8');
-  const json = JSON.stringify(products, null, 2);
-  const block = `/*__PRODUCTS_START__*/\n${json}\n/*__PRODUCTS_END__*/`;
-  if (html.includes('/*__PRODUCTS_START__*/')) {
-    html = html.replace(/\/\*__PRODUCTS_START__\*\/[\s\S]*?\/\*__PRODUCTS_END__\*\//, () => block);
-  } else {
-    html = html.replace(
-      /(const defaultProducts\s*=\s*)(\[[\s\S]*?\]);/,
-      (_, prefix) => `${prefix}${block};`
-    );
-  }
-  fs.writeFileSync(HTML_FILE, html, 'utf8');
+// ============================================================
+// FUNÇÃO: writeProductsToHTML
+// ANTES: reescrevia o bloco /*__PRODUCTS_START__*/ no index.html
+// DEPOIS: faz upsert de todos os produtos no Supabase
+// ============================================================
+async function writeProductsToHTML(products) {
+  const { error } = await supabase
+    .from('produtos')
+    .upsert(products, { onConflict: 'id' });
+  if (error) throw error;
 }
 
-function upsertProduct(product) {
-  const products = readProductsFromHTML();
-  const idx = products.findIndex(p => p.id === product.id);
-  if (idx > -1) products[idx] = {...products[idx],...product };
+// ============================================================
+// FUNÇÃO: upsertProduct
+// ANTES: chamava readProductsFromHTML + writeProductsToHTML (síncronas)
+// DEPOIS: igual mas com await (agora são assíncronas)
+// ============================================================
+async function upsertProduct(product) {
+  const products = await readProductsFromHTML();
+  const idx = products.findIndex(p => String(p.id) === String(product.id));
+  if (idx > -1) products[idx] = {...products[idx], ...product};
   else products.push(product);
-  writeProductsToHTML(products);
+  await writeProductsToHTML(products);
   return products;
 }
 
-function removeProduct(id) {
-  const products = readProductsFromHTML().filter(p => p.id!== id);
-  writeProductsToHTML(products);
-  return products;
+// ============================================================
+// FUNÇÃO: removeProduct
+// ANTES: filtrava array local e reescrevia no HTML
+// DEPOIS: deleta directamente no Supabase por id
+// ============================================================
+async function removeProduct(id) {
+  const { error } = await supabase
+    .from('produtos')
+    .delete()
+    .eq('id', String(id));
+  if (error) throw error;
+  return await readProductsFromHTML();
 }
 
-function saveImage(filename, data) {
-  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const dest = path.join(IMG_DIR, safe);
-  fs.writeFileSync(dest, data);
-  return '/imagens/' + safe;
+// ============================================================
+// FUNÇÃO: saveImage
+// ANTES: fs.writeFileSync — guardava imagem em /imagens no disco local
+// DEPOIS: uploadToCloudinary — envia imagem para a nuvem Cloudinary
+// ============================================================
+async function saveImage(filename, data) {
+  return new Promise((resolve, reject) => {
+    const publicId = filename.replace(/\.[^.]+$/, ''); // nome sem extensão
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'aquigarcia',
+        public_id: publicId,
+        overwrite: true,
+        resource_type: 'image',
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        // DEPOIS: devolve o URL permanente do Cloudinary em vez de '/imagens/...'
+        resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(data);
+  });
 }
 
+// ============================================================
+// FUNÇÃO: slugify — SEM ALTERAÇÕES
+// ============================================================
 function slugify(str) {
   return (str || 'produto').toLowerCase()
  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+// ============================================================
+// FUNÇÃO: setCORSHeaders — SEM ALTERAÇÕES
+// ============================================================
 function setCORSHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+// ============================================================
+// FUNÇÃO: jsonRes — SEM ALTERAÇÕES
+// ============================================================
 function jsonRes(res, code, data) {
   setCORSHeaders(res);
   res.writeHead(code, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(data));
 }
 
+// ============================================================
+// SERVIDOR HTTP — ROTAS
+// Estrutura 100% idêntica ao original.
+// Só as funções internas mudaram (agora com await).
+// ============================================================
 const server = http.createServer(async (req, res) => {
   const parsed = url.parse(req.url, true);
   const pathname = parsed.pathname;
@@ -5231,20 +5317,34 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
+  // ----------------------------------------------------------
+  // ROTA: POST /upload
+  // ANTES: guardava buffer em disco → /imagens/FICHEIRO.jpg
+  // DEPOIS: envia buffer para Cloudinary → URL permanente
+  // ----------------------------------------------------------
   if (req.method === 'POST' && pathname === '/upload') {
     try {
       const chunks = [];
       req.on('data', chunk => chunks.push(chunk));
-      req.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        if (buffer.length === 0) {
-          return jsonRes(res, 400, { ok: false, error: 'Arquivo vazio' });
+      req.on('end', async () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          if (buffer.length === 0) {
+            return jsonRes(res, 400, { ok: false, error: 'Arquivo vazio' });
+          }
+          // ANTES: const fileName = Date.now() + '-' + ... + '.jpg';
+          // ANTES: fs.writeFileSync(filePath, buffer);
+          // DEPOIS: upload directo para Cloudinary
+          const fileName = 'upload_' + Date.now() + '_' + Math.round(Math.random() * 1E9);
+          const cloudUrl = await saveImage(fileName, buffer);
+          console.log(`📸 [${new Date().toLocaleTimeString()}] Imagem enviada para Cloudinary: ${cloudUrl}`);
+          // ANTES: return jsonRes(res, 200, { ok: true, url: '/imagens/' + fileName });
+          // DEPOIS: devolve o URL do Cloudinary directamente
+          return jsonRes(res, 200, { ok: true, url: cloudUrl });
+        } catch (err) {
+          console.error('Erro no upload Cloudinary:', err.message);
+          return jsonRes(res, 500, { ok: false, error: err.message });
         }
-        const fileName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.jpg';
-        const filePath = path.join(IMG_DIR, fileName);
-        fs.writeFileSync(filePath, buffer);
-        console.log(`📸 [${new Date().toLocaleTimeString()}] Imagem salva: ${fileName}`);
-        return jsonRes(res, 200, { ok: true, url: '/imagens/' + fileName });
       });
     } catch (err) {
       console.error('Erro no upload:', err.message);
@@ -5253,16 +5353,26 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ----------------------------------------------------------
+  // ROTA: GET /api/products
+  // ANTES: lia do index.html (síncrono)
+  // DEPOIS: lê do Supabase (assíncrono)
+  // ----------------------------------------------------------
   if (req.method === 'GET' && pathname === '/api/products') {
-    const products = readProductsFromHTML();
+    const products = await readProductsFromHTML();
     return jsonRes(res, 200, { ok: true, products, total: products.length });
   }
 
+  // ----------------------------------------------------------
+  // ROTA: POST /api/products/bulk
+  // ANTES: writeProductsToHTML (síncrono)
+  // DEPOIS: upsert no Supabase (assíncrono)
+  // ----------------------------------------------------------
   if (req.method === 'POST' && pathname === '/api/products/bulk') {
     try {
       const body = await readBody(req);
       const products = JSON.parse(body.toString('utf8'));
-      writeProductsToHTML(products);
+      await writeProductsToHTML(products);
       console.log(`📦 Catálogo actualizado: ${products.length} produtos`);
       return jsonRes(res, 200, { ok: true, total: products.length });
     } catch (err) {
@@ -5270,6 +5380,11 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ----------------------------------------------------------
+  // ROTA: POST /api/products
+  // ANTES: saveImage guardava em disco, upsertProduct escrevia no HTML
+  // DEPOIS: saveImage envia para Cloudinary, upsertProduct salva no Supabase
+  // ----------------------------------------------------------
   if (req.method === 'POST' && pathname === '/api/products') {
     try {
       const body = await readBody(req);
@@ -5282,7 +5397,9 @@ const server = http.createServer(async (req, res) => {
         if (files.image && files.image.data.length > 0) {
           const ext = path.extname(files.image.filename) || '.jpg';
           const filename = slugify(fields.name) + '_' + Date.now() + ext;
-          imgPath = saveImage(filename, files.image.data);
+          // ANTES: imgPath = saveImage(filename, files.image.data); // síncrono, disco local
+          // DEPOIS: imgPath agora é URL do Cloudinary
+          imgPath = await saveImage(filename, files.image.data);
         }
         product = {
           id: fields.id || Date.now().toString(),
@@ -5296,7 +5413,9 @@ const server = http.createServer(async (req, res) => {
       } else {
         product = JSON.parse(body.toString('utf8'));
       }
-      const products = upsertProduct(product);
+      // ANTES: const products = upsertProduct(product); // síncrono
+      // DEPOIS: await upsertProduct(product); // assíncrono (Supabase)
+      const products = await upsertProduct(product);
       console.log(`✅ [${new Date().toLocaleTimeString()}] Produto guardado: "${product.name}"`);
       return jsonRes(res, 200, { ok: true, product, total: products.length });
     } catch (err) {
@@ -5305,10 +5424,17 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ----------------------------------------------------------
+  // ROTA: DELETE /api/products/:id
+  // ANTES: removeProduct filtrava array e reescrevia HTML
+  // DEPOIS: removeProduct apaga directamente no Supabase
+  // ----------------------------------------------------------
   if (req.method === 'DELETE' && pathname.startsWith('/api/products/')) {
     try {
       const id = decodeURIComponent(pathname.replace('/api/products/', ''));
-      const products = removeProduct(id);
+      // ANTES: const products = removeProduct(id); // síncrono
+      // DEPOIS: await removeProduct(id); // assíncrono (Supabase)
+      const products = await removeProduct(id);
       console.log(`🗑️ [${new Date().toLocaleTimeString()}] Produto removido: id=${id}`);
       return jsonRes(res, 200, { ok: true, total: products.length });
     } catch (err) {
@@ -5316,6 +5442,10 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ----------------------------------------------------------
+  // SERVIDOR DE FICHEIROS ESTÁTICOS — SEM ALTERAÇÕES
+  // Serve index.html, CSS, JS, imagens antigas em /imagens, etc.
+  // ----------------------------------------------------------
   let filePath = pathname === '/'? '/index.html' : pathname;
   filePath = path.join(ROOT, filePath);
   if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
@@ -5339,6 +5469,8 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`║   Porta: ${PORT}                               ║`);
   console.log('║   Admin: Sobre Nós → Painel de Gestão      ║');
   console.log('║   Senha: admin123                           ║');
+  console.log('╠════════════════════════════════════════════╣');
+  console.log('║   BD: Supabase ☁️   Imagens: Cloudinary ☁️  ║');
   console.log('╚════════════════════════════════════════════╝');
   console.log('');
   console.log('   Aguardando pedidos...');

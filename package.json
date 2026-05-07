@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "migrar": "node migrar.js"
   },
   "engines": {
     "node": ">=16.0.0"
@@ -13,6 +14,10 @@
   "keywords": [],
   "author": "AquiGarcia",
   "license": "ISC",
-"dependencies":  {"express": "^4.18.2"
-}
+  "dependencies": {
+    "express": "^4.18.2",
+    "@supabase/supabase-js": "^2.39.0",
+    "cloudinary": "^1.41.3",
+    "dotenv": "^16.3.1"
+  }
 }
