@@ -701,26 +701,20 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
 <!-- ═══════════════════════════════════════════
      LOGIN MODAL
 ═══════════════════════════════════════════ -->
-<div id="loginModalBg" class="modal-bg">
+<div id="loginModalBg" class="modal-bg" style="display:flex">
   <div class="login-modal anim-scaleUp">
     <div class="login-modal-hero">
-      <svg class="login-modal-hero-bg" viewBox="0 0 440 120" preserveAspectRatio="none">
-        <circle cx="380" cy="20" r="80" opacity=".3"/><circle cx="60" cy="100" r="60" opacity=".2"/><circle cx="220" cy="60" r="120" opacity=".1"/>
-      </svg>
-      <div class="login-modal-brand">
-        <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/></svg></div>
-        <div class="logo-name">Aqui<span>Garcia</span></div>
-        <p>A sua conta pessoal</p>
-      </div>
-      <button class="modal-close" onclick="closeLoginModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <!-- ... o teu SVG e logo ficam iguais ... -->
+      <button class="modal-close" onclick="closeLoginModal()">×</button>
     </div>
     <div class="login-modal-body">
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sessão</button>
         <button class="auth-tab" id="tabReg" onclick="switchAuthTab('register')">Criar Conta</button>
       </div>
+
+      <div id="authError" class="error-msg" style="color:#e11d48;margin:8px 0;display:none"></div>
+
       <div id="registerExtra" style="display:none">
         <div class="form-group">
           <label class="form-label">Nome completo</label>
@@ -735,11 +729,24 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
         <label class="form-label">Senha</label>
         <input class="form-input" type="password" id="authPass" placeholder="••••••••">
       </div>
+
       <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuth()">Iniciar Sessão</button>
-      <p class="modal-note">Ao continuar, aceita os nossos Termos de Serviço.</p>
+
+      <div class="divider" style="text-align:center;margin:12px 0;opacity:.6">ou</div>
+
+      <!-- Google -->
+      <div id="g_id_onload"
+           data-client_id="SEU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleGoogleCredential">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="continue_with" data-shape="rectangular"></div>
+
+      <p class="modal-note">Ao continuar, aceita os nossos Termos.</p>
     </div>
   </div>
 </div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <!-- ═══════════════════════════════════════════
      ADMIN MODAL
@@ -2495,8 +2502,15 @@ function resetFeedback() {
 }
 
 /* ── AUTH MODAL ── */
-function openLoginModal()  { document.getElementById('loginModalBg').classList.add('open'); }
-function closeLoginModal() { document.getElementById('loginModalBg').classList.remove('open'); }
+let authMode = 'login'; // agora é oficial
+
+function openLoginModal()  { 
+  document.getElementById('loginModalBg').classList.add('open'); 
+}
+function closeLoginModal() { 
+  document.getElementById('loginModalBg').classList.remove('open'); 
+}
+
 function switchAuthTab(tab) {
   authMode = tab;
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
@@ -2504,10 +2518,46 @@ function switchAuthTab(tab) {
   document.getElementById('registerExtra').style.display = tab === 'register' ? 'block' : 'none';
   document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Iniciar Sessão' : 'Criar Conta';
 }
-function handleAuth() {
-  showToast(authMode === 'login' ? 'Sessão iniciada com sucesso!' : 'Conta criada com sucesso!', 'success');
-  closeLoginModal();
+
+async function handleAuth(event) {
+  if (event) event.preventDefault();
+
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const name = document.getElementById('authName')?.value.trim() || '';
+
+  if (!email || !password || (authMode === 'register' && !name)) {
+    showToast('Preenche todos os campos', 'error');
+    return;
+  }
+
+  const endpoint = authMode === 'login' ? '/api/login' : '/api/register';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // para cookies de sessão
+      body: JSON.stringify({ email, password, name })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || 'Erro no servidor');
+
+    // guarda sessão simples
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    showToast(authMode === 'login' ? 'Sessão iniciada!' : 'Conta criada!', 'success');
+    closeLoginModal();
+    // aqui podes atualizar o header: mostrar nome do user
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
+
+// liga ao botão
+document.getElementById('authSubmitBtn').addEventListener('click', handleAuth);
 
 /* ── ADMIN MODAL ── */
 function openAdminModal()  { document.getElementById('adminModalBg').classList.add('open'); setTimeout(()=>document.getElementById('adminPwd').focus(),100); }
