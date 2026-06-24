@@ -65,6 +65,7 @@
 }
 
 /* ═══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    RESET & BASE
 ═══════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -569,6 +570,31 @@ label.form-label{display:block;font-size:.83rem;font-weight:600;color:var(--ink3
 .map-container iframe{display:block;width:100%;min-height:440px}
 
 /* ═══════════════════════════════════════════════
+   LOGIN MODAL
+═══════════════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.login-modal{width:100%;max-width:440px;background:white;border-radius:var(--r-xl);overflow:hidden;transform:scale(.94) translateY(20px);transition:transform .35s var(--ease);box-shadow:var(--sh-xl)}
+.modal-bg.open .login-modal{transform:none}
+.login-modal-hero{position:relative;height:120px;background:linear-gradient(135deg,var(--g600),var(--b500));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.login-modal-hero-bg{position:absolute;inset:0;opacity:.15}
+.login-modal-hero-bg circle{fill:white}
+.login-modal-brand{text-align:center;position:relative;z-index:2}
+.login-modal-brand .logo-icon{margin:0 auto 6px;width:44px;height:44px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4)}
+.login-modal-brand p{color:rgba(255,255,255,.9);font-size:.82rem}
+.login-modal-brand .logo-name{color:white;font-size:1.1rem}
+.modal-close{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;border-radius:var(--r-sm);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10}
+.modal-close:hover{background:rgba(255,255,255,.35)}
+.modal-close svg{width:15px;height:15px;stroke:white}
+.login-modal-body{padding:32px}
+.auth-tabs{display:flex;background:var(--surf);border-radius:var(--r-md);padding:4px;gap:4px;margin-bottom:26px}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;background:none;color:var(--ink4);transition:all .2s}
+.auth-tab.active{background:white;color:var(--ink);box-shadow:var(--sh-sm)}
+.login-modal-body .form-group{margin-bottom:16px}
+.login-modal-body .form-input{background:var(--surf)}
+.modal-note{text-align:center;font-size:.78rem;color:var(--ink5);margin-top:14px}
+
+/* ═══════════════════════════════════════════════
    ADMIN MODAL
 ═══════════════════════════════════════════════ */
 .admin-modal{max-width:380px}
@@ -671,6 +697,49 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
 <div id="toast" class="toast">
   <div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
   <span id="toastMsg"></span>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN MODAL
+═══════════════════════════════════════════ -->
+<div id="loginModalBg" class="modal-bg">
+  <div class="login-modal anim-scaleUp">
+    <div class="login-modal-hero">
+      <svg class="login-modal-hero-bg" viewBox="0 0 440 120" preserveAspectRatio="none">
+        <circle cx="380" cy="20" r="80" opacity=".3"/><circle cx="60" cy="100" r="60" opacity=".2"/><circle cx="220" cy="60" r="120" opacity=".1"/>
+      </svg>
+      <div class="login-modal-brand">
+        <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/></svg></div>
+        <div class="logo-name">Aqui<span>Garcia</span></div>
+        <p>A sua conta pessoal</p>
+      </div>
+      <button class="modal-close" onclick="closeLoginModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="login-modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sessão</button>
+        <button class="auth-tab" id="tabReg" onclick="switchAuthTab('register')">Criar Conta</button>
+      </div>
+      <div id="registerExtra" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Nome completo</label>
+          <input class="form-input" type="text" id="authName" placeholder="O seu nome">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço de email</label>
+        <input class="form-input" type="email" id="authEmail" placeholder="nome@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-input" type="password" id="authPass" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuth()">Iniciar Sessão</button>
+      <p class="modal-note">Ao continuar, aceita os nossos Termos de Serviço.</p>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -824,7 +893,7 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
 
       <!-- HERO VISUAL -->
       <div class="hero-visual anim-slideL d2">
-
+        
         <img src="162648ce-46bc-433a-a6cc-473313c6ea77.jpeg" alt="AquiGarcia - Escritório moderno" class="hero-main-img">
 
         <!-- Floating card 1 -->
@@ -1032,7 +1101,6 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
   </div>
 
 </div><!-- /page-home -->
-
 <!-- ═══════════════════════════════════════════════════════════════════
      PAGE: PRODUCTS
 ═══════════════════════════════════════════════════════════════════ -->
