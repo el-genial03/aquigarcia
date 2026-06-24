@@ -569,21 +569,6 @@ label.form-label{display:block;font-size:.83rem;font-weight:600;color:var(--ink3
 .map-container iframe{display:block;width:100%;min-height:440px}
 
 /* ═══════════════════════════════════════════════
-  /* ── AUTH MODAL ── */
-function openLoginModal()  { document.getElementById('loginModalBg').classList.add('open'); }
-function closeLoginModal() { document.getElementById('loginModalBg').classList.remove('open'); }
-function switchAuthTab(tab) {
-  authMode = tab;
-  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('tabReg').classList.toggle('active', tab === 'register');
-  document.getElementById('registerExtra').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Iniciar Sessão' : 'Criar Conta';
-}
-function handleAuth() {
-  showToast(authMode === 'login' ? 'Sessão iniciada com sucesso!' : 'Conta criada com sucesso!', 'success');
-  closeLoginModal();
-}
-/* ═══════════════════════════════════════════════
    ADMIN MODAL
 ═══════════════════════════════════════════════ */
 .admin-modal{max-width:380px}
