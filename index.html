@@ -6,6 +6,7 @@
 <title>AquiGarcia — Materiais de Escritório, Alimentícios & Higienização | Luanda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 /* ═══════════════════════════════════════════════
    DESIGN TOKENS
@@ -733,8 +734,31 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
       <div class="form-group">
         <label class="form-label">Senha</label>
         <input class="form-input" type="password" id="authPass" placeholder="••••••••">
+        <div id="forgotWrap" style="text-align:right;margin-top:6px">
+          <button type="button" onclick="abrirRecuperacao()" style="background:none;border:none;color:var(--g600);font-size:.78rem;font-weight:600;cursor:pointer;padding:0">Esqueceu a senha?</button>
+        </div>
       </div>
       <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuth()">Iniciar Sessão</button>
+
+      <!-- DIVISOR -->
+      <div class="oauth-divider" style="display:flex;align-items:center;gap:10px;margin:16px 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:.75rem;color:var(--ink5);white-space:nowrap">ou continua com</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- BOTÕES OAUTH -->
+      <div class="oauth-divider-wrap" style="display:flex;flex-direction:column;gap:10px">
+        <button class="oauth-btn" onclick="loginComGoogle()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);background:white;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#4285f4';this.style.background='#f8faff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='white'">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.9 3 4 11.9 4 23s8.9 20 20 20c11 0 20-8 20-20 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.9 6.3 14.7z"/><path fill="#FBBC05" d="M24 44c5.9 0 11-2 14.7-5.4l-6.8-5.6C29.9 35 27.1 36 24 36c-6 0-11.1-4-12.9-9.5l-7 5.4C7.8 39.9 15.3 44 24 44z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.3-2.3 4.3-4.3 5.7l6.8 5.6C42.3 36.5 45 30.2 45 23c0-1.3-.2-2-.5-3z"/></svg>
+          Continuar com Google
+        </button>
+        <button class="oauth-btn" onclick="loginComFacebook()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);background:white;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#1877f2';this.style.background='#f0f4ff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='white'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Continuar com Facebook
+        </button>
+      </div>
+
       <p class="modal-note">Ao continuar, aceita os nossos Termos de Serviço.</p>
     </div>
   </div>
@@ -860,7 +884,7 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
           <span class="line-green">de confiança</span><br>
           em <span class="line-underline">Angola</span>
         </h1>
-        <p class="hero-sub anim-fadeUp d2">Materiais de escritório, alimentícios não perecíveis e produtos de higienização — tudo num só lugar, com os melhores preços de Luanda.</p>
+        <p class="hero-sub anim-fadeUp d2">Materiais de escritório, alimentícios não perecíveis e produtos de higienização — tudo num só lugar, com os melhores preços de Angola.</p>
         <div class="hero-actions anim-fadeUp d3">
           <button class="btn btn-primary btn-lg ripple-btn" onclick="navigateTo('products')">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:18px;height:18px"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="m16 8 5 2v10H7v-5"/></svg>
@@ -884,7 +908,7 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
           </div>
           <div>
             <div class="trust-stars">★★★★★</div>
-            <p class="trust-text"><strong>+2.000</strong> clientes satisfeitos em Luanda</p>
+            <p class="trust-text"><strong>+2.000</strong> clientes satisfeitos em Angola</p>
           </div>
         </div>
       </div>
@@ -1500,6 +1524,41 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
   </div>
 </footer>
 
+
+<!-- ═══════════════════════════════════════════
+     MODAL RECUPERAÇÃO DE SENHA
+═══════════════════════════════════════════ -->
+<div id="recoveryModalBg" style="position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)">
+  <div style="width:100%;max-width:400px;background:white;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-xl);padding:36px;position:relative">
+    <button onclick="fecharRecuperacao()" style="position:absolute;top:14px;right:14px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r-sm);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" style="width:15px;height:15px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:56px;height:56px;background:var(--g50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="1.8" style="width:26px;height:26px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3 style="font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:800;margin-bottom:6px">Recuperar senha</h3>
+      <p style="font-size:.85rem;color:var(--ink4)">Insere o teu email e enviaremos um link para redefinires a senha.</p>
+    </div>
+    <div id="recoveryForm">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="recoveryEmail" placeholder="nome@email.com">
+      </div>
+      <p id="recoveryError" style="color:#ef4444;font-size:.82rem;margin-bottom:10px;display:none"></p>
+      <button onclick="enviarRecuperacao()" id="recoveryBtn" class="btn btn-primary btn-full">Enviar link de recuperação</button>
+    </div>
+    <div id="recoverySuccess" style="display:none;text-align:center;padding:16px 0">
+      <div style="width:56px;height:56px;background:var(--g50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--g500)" stroke-width="2" style="width:28px;height:28px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <h4 style="font-family:'Sora',sans-serif;font-weight:800;margin-bottom:8px">Email enviado!</h4>
+      <p style="font-size:.875rem;color:var(--ink4)">Verifica a caixa de entrada (e spam) do teu email para o link de recuperação.</p>
+      <button onclick="fecharRecuperacao()" class="btn btn-outline" style="margin-top:16px">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════ -->
@@ -1507,12 +1566,111 @@ footer{background:var(--ink2);color:white;padding:72px 0 0}
 <script>
 'use strict';
 
+/* ── SUPABASE CLIENT (OAuth) ── */
+let supabaseClient = null; // mantido por compatibilidade
+let _supabaseConfig = null;
+
+async function getSupabaseConfig() {
+  if (_supabaseConfig) return _supabaseConfig;
+  try {
+    const resp  = await fetch('/api/config');
+    const dados = await resp.json();
+    if (dados.supabaseUrl && dados.supabaseAnonKey) {
+      _supabaseConfig = dados;
+      return dados;
+    }
+  } catch(e) { console.error('[getSupabaseConfig]', e.message); }
+  return null;
+}
+
+async function initSupabase() {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    await handleOAuthRedirect();
+  }
+}
+
+async function handleOAuthRedirect() {
+  const hash = window.location.hash;
+  if (!hash || !hash.includes('access_token')) return;
+
+  const params = {};
+  hash.slice(1).split('&').forEach(pair => {
+    const [k, v] = pair.split('=');
+    if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+  });
+
+  if (!params.access_token) return;
+
+  try {
+    const cfg = await getSupabaseConfig();
+    if (!cfg) throw new Error('Config indisponível');
+
+    const userResp = await fetch(cfg.supabaseUrl + '/auth/v1/user', {
+      headers: {
+        'Authorization': 'Bearer ' + params.access_token,
+        'apikey': cfg.supabaseAnonKey,
+      },
+    });
+    const userData = await userResp.json();
+    if (!userData.email) throw new Error('Email não disponível do OAuth');
+
+    const authResp = await fetch('/api/auth/oauth', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_token: params.access_token,
+        email: userData.email,
+        nome:  (userData.user_metadata && (userData.user_metadata.full_name || userData.user_metadata.name))
+               || userData.email.split('@')[0],
+      }),
+    });
+    const authData = await authResp.json();
+
+    if (authData.ok) {
+      localStorage.setItem('ag_token', authData.token);
+      setCurrentUser(authData.user);
+      showToast('Bem-vindo, ' + authData.user.nome.split(' ')[0] + '! 👋', 'success');
+    } else {
+      throw new Error(authData.error || 'Erro desconhecido');
+    }
+  } catch(err) {
+    console.error('[handleOAuthRedirect]', err.message);
+    showToast('Erro ao completar login OAuth. Tenta novamente.', 'error');
+  } finally {
+    history.replaceState(null, '', window.location.pathname);
+  }
+}
+
+async function loginComOAuth(provider) {
+  try {
+    const cfg = await getSupabaseConfig();
+    if (!cfg || !cfg.supabaseUrl) {
+      showToast('Erro de configuração do servidor. Tenta novamente.', 'error');
+      return;
+    }
+    const redirectTo = encodeURIComponent(window.location.origin + '/');
+    const oauthUrl   = cfg.supabaseUrl + '/auth/v1/authorize?provider=' + provider + '&redirect_to=' + redirectTo;
+    const nomes      = { google: 'Google', facebook: 'Facebook' };
+    showToast('A redirecionar para ' + (nomes[provider] || provider) + '...', '');
+    setTimeout(function() { window.location.href = oauthUrl; }, 600);
+  } catch(err) {
+    console.error('[loginComOAuth]', err.message);
+    showToast('Erro ao iniciar login. Tenta novamente.', 'error');
+  }
+}
+
+async function loginComGoogle()   { await loginComOAuth('google');   }
+async function loginComFacebook() { await loginComOAuth('facebook'); }
+
+
 /* ── STATE ── */
-let cart       = [];
-let products   = [];
-let isAdmin    = false;
-let authMode   = 'login';
-let currRating = 5;
+let cart        = [];
+let products    = [];
+let isAdmin     = false;
+let authMode    = 'login';
+let currRating  = 5;
+let currentUser = null;
 
 /* ── PRODUCT DATA ── */
 const defaultProducts = /*__PRODUCTS_START__*/
@@ -2063,6 +2221,8 @@ const curiosities = [
 
 /* ── INIT ── */
 (async function init() {
+  await initSupabase();
+  await checkSession();
   await loadProductsFromServer();
   renderProducts();
   renderCuriosities();
@@ -2502,18 +2662,228 @@ function resetFeedback() {
 }
 
 /* ── AUTH MODAL ── */
-function openLoginModal()  { document.getElementById('loginModalBg').classList.add('open'); }
-function closeLoginModal() { document.getElementById('loginModalBg').classList.remove('open'); }
+/* ── AUTH MODAL ── */
+function openLoginModal() {
+  if (currentUser) return;
+  document.getElementById('loginModalBg').classList.add('open');
+}
+function closeLoginModal() {
+  document.getElementById('loginModalBg').classList.remove('open');
+  const errEl = document.getElementById('authError');
+  if (errEl) errEl.style.display = 'none';
+}
 function switchAuthTab(tab) {
   authMode = tab;
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
   document.getElementById('tabReg').classList.toggle('active', tab === 'register');
   document.getElementById('registerExtra').style.display = tab === 'register' ? 'block' : 'none';
   document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Iniciar Sessão' : 'Criar Conta';
+  const errEl = document.getElementById('authError');
+  if (errEl) errEl.style.display = 'none';
+  // Mostrar/esconder "Esqueceu a senha?" conforme o tab
+  const forgotWrap = document.getElementById('forgotWrap');
+  if (forgotWrap) forgotWrap.style.display = tab === 'login' ? 'block' : 'none';
 }
-function handleAuth() {
-  showToast(authMode === 'login' ? 'Sessão iniciada com sucesso!' : 'Conta criada com sucesso!', 'success');
+
+function showAuthError(msg) {
+  let errEl = document.getElementById('authError');
+  if (!errEl) {
+    errEl = document.createElement('p');
+    errEl.id = 'authError';
+    errEl.style.cssText = 'color:#ef4444;font-size:.82rem;margin-top:-8px;margin-bottom:10px;text-align:center;font-weight:600';
+    document.getElementById('authSubmitBtn').insertAdjacentElement('beforebegin', errEl);
+  }
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+
+function setCurrentUser(user) {
+  currentUser = user;
+  const btnSignin = document.querySelector('.btn-signin');
+  if (btnSignin) {
+    if (user) {
+      btnSignin.textContent = user.nome.split(' ')[0];
+      btnSignin.onclick = confirmarLogout;
+      btnSignin.title = 'Clique para ver opções de conta';
+      btnSignin.style.background = 'var(--g600)';
+    } else {
+      btnSignin.textContent = 'Entrar';
+      btnSignin.onclick = openLoginModal;
+      btnSignin.title = '';
+      btnSignin.style.background = '';
+    }
+  }
+  const mobBtn = document.querySelector('.mob-link[style*="g600"]');
+  if (mobBtn) {
+    if (user) {
+      mobBtn.textContent = `Sair (${user.nome.split(' ')[0]})`;
+      mobBtn.onclick = () => { confirmarLogout(); closeMobileNav(); };
+    } else {
+      mobBtn.textContent = 'Iniciar Sessão / Criar Conta';
+      mobBtn.onclick = () => { openLoginModal(); closeMobileNav(); };
+    }
+  }
+}
+
+function confirmarLogout() {
+  // Mostrar mini-modal de confirmação inline
+  const existing = document.getElementById('logoutConfirmModal');
+  if (existing) { existing.remove(); return; }
+
+  const modal = document.createElement('div');
+  modal.id = 'logoutConfirmModal';
+  modal.style.cssText = 'position:fixed;top:76px;right:28px;z-index:9000;background:white;border:1px solid var(--border);border-radius:var(--r-md);padding:18px 20px;box-shadow:var(--sh-xl);min-width:220px;animation:scaleUp .2s var(--ease)';
+  modal.innerHTML = `
+    <p style="font-family:'Sora',sans-serif;font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:4px">Olá, ${currentUser.nome.split(' ')[0]}!</p>
+    <p style="font-size:.8rem;color:var(--ink5);margin-bottom:14px">${currentUser.email}</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="document.getElementById('logoutConfirmModal').remove()" style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 14px;font-size:.83rem;font-weight:600;cursor:pointer;color:var(--ink3)">Continuar na sessão</button>
+      <button onclick="logout()" style="background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r-sm);padding:9px 14px;font-size:.83rem;font-weight:600;cursor:pointer;color:#dc2626">Terminar sessão</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Fechar ao clicar fora
+  setTimeout(() => {
+    document.addEventListener('click', function handler(e) {
+      if (!modal.contains(e.target)) {
+        modal.remove();
+        document.removeEventListener('click', handler);
+      }
+    });
+  }, 100);
+}
+
+function logout() {
+  const modal = document.getElementById('logoutConfirmModal');
+  if (modal) modal.remove();
+  localStorage.removeItem('ag_token');
+  setCurrentUser(null);
+  showToast('Sessão encerrada. Até logo!', '');
+}
+
+async function checkSession() {
+  const token = localStorage.getItem('ag_token');
+  if (!token) return;
+  try {
+    const resp  = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    const dados = await resp.json();
+    if (dados.ok) {
+      setCurrentUser(dados.user);
+    } else {
+      // Token inválido ou expirado — limpar e não mostrar erro
+      localStorage.removeItem('ag_token');
+      console.log('[checkSession] Token expirado, sessão limpa.');
+    }
+  } catch (err) {
+    // Sem ligação ao servidor — manter token para tentar depois
+    console.warn('[checkSession] Sem ligação:', err.message);
+  }
+}
+
+
+/* ── RECUPERAÇÃO DE SENHA ── */
+function abrirRecuperacao() {
   closeLoginModal();
+  const modal = document.getElementById('recoveryModalBg');
+  modal.style.opacity = '1';
+  modal.style.pointerEvents = 'all';
+  document.getElementById('recoveryEmail').value = '';
+  document.getElementById('recoveryError').style.display = 'none';
+  document.getElementById('recoveryForm').style.display = 'block';
+  document.getElementById('recoverySuccess').style.display = 'none';
+  setTimeout(() => document.getElementById('recoveryEmail').focus(), 100);
+}
+
+function fecharRecuperacao() {
+  const modal = document.getElementById('recoveryModalBg');
+  modal.style.opacity = '0';
+  modal.style.pointerEvents = 'none';
+}
+
+async function enviarRecuperacao() {
+  const email = document.getElementById('recoveryEmail').value.trim();
+  const errEl = document.getElementById('recoveryError');
+  const btn   = document.getElementById('recoveryBtn');
+
+  if (!email) {
+    errEl.textContent = 'Insere o teu email.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'A enviar...';
+  errEl.style.display = 'none';
+
+  try {
+    // Usa o servidor para enviar o email — não precisa do SDK Supabase no frontend
+    const resp  = await fetch('/api/auth/reset-password', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email }),
+    });
+    const dados = await resp.json();
+
+    if (!dados.ok) throw new Error(dados.error || 'Erro desconhecido');
+
+    document.getElementById('recoveryForm').style.display = 'none';
+    document.getElementById('recoverySuccess').style.display = 'block';
+  } catch (err) {
+    errEl.textContent = 'Erro ao enviar email. Verifica o endereço e tenta novamente.';
+    errEl.style.display = 'block';
+    console.error('[enviarRecuperacao]', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar link de recuperação';
+  }
+}
+
+// Fechar modal de recuperação ao clicar no fundo
+document.getElementById('recoveryModalBg')?.addEventListener('click', function(e) {
+  if (e.target === this) fecharRecuperacao();
+});
+
+async function handleAuth() {
+  const btn   = document.getElementById('authSubmitBtn');
+  const email = document.getElementById('authEmail').value.trim();
+  const senha = document.getElementById('authPass').value;
+  const nome  = authMode === 'register' ? (document.getElementById('authName')?.value.trim() || '') : '';
+
+  if (!email || !senha)                                { showAuthError('Preenche todos os campos.'); return; }
+  if (authMode === 'register' && !nome)                { showAuthError('Insere o teu nome.'); return; }
+  if (authMode === 'register' && senha.length < 6)     { showAuthError('A senha deve ter pelo menos 6 caracteres.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? 'A entrar...' : 'A criar conta...';
+
+  try {
+    const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+    const payload  = authMode === 'login' ? { email, senha } : { nome, email, senha };
+
+    const resp  = await fetch(endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const dados = await resp.json();
+
+    if (!dados.ok) { showAuthError(dados.error || 'Erro desconhecido.'); return; }
+
+    localStorage.setItem('ag_token', dados.token);
+    setCurrentUser(dados.user);
+    closeLoginModal();
+    showToast(`Bem-vindo${authMode === 'register' ? '' : ' de volta'}, ${dados.user.nome.split(' ')[0]}! 👋`, 'success');
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPass').value  = '';
+    if (document.getElementById('authName')) document.getElementById('authName').value = '';
+
+  } catch (err) {
+    showAuthError('Erro de ligação. Tenta novamente.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Iniciar Sessão' : 'Criar Conta';
+  }
 }
 
 /* ── ADMIN MODAL ── */
