@@ -5089,16 +5089,17 @@ const http     = require('http');
 const fs       = require('fs');
 const path     = require('path');
 const url      = require('url');
+const crypto   = require('crypto');
 
 require('dotenv').config();
 
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs'); // puro JS — sem problemas de compilação no Render
+const jwt    = require('jsonwebtoken');
 
-// IMPORTANTE: usa sempre a service_role key no backend
-// para ignorar RLS e ter permissão total
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY   // deve ser a service_role key no .env
+  process.env.SUPABASE_KEY
 );
 
 const cloudinary = require('cloudinary').v2;
@@ -5108,10 +5109,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const PORT    = process.env.PORT || 3000;
-const ROOT    = __dirname;
-const HTML_FILE = path.join(ROOT, 'index.html');
-const IMG_DIR   = path.join(ROOT, 'imagens');
+const PORT           = process.env.PORT || 3000;
+const ROOT           = __dirname;
+const HTML_FILE      = path.join(ROOT, 'index.html');
+const IMG_DIR        = path.join(ROOT, 'imagens');
+const JWT_SECRET     = process.env.JWT_SECRET || 'aquigarcia_jwt_secret_2026_seguro';
+const SALT_ROUNDS    = 10;
+const SUPABASE_ANON  = process.env.SUPABASE_ANON_KEY || '';
 
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
@@ -5130,7 +5134,7 @@ const MIME = {
 };
 
 // ============================================================
-// UTILITÁRIOS — SEM ALTERAÇÕES EM RELAÇÃO AO ORIGINAL
+// UTILITÁRIOS
 // ============================================================
 
 function readBody(req) {
@@ -5160,9 +5164,9 @@ function parseMultipart(buffer, boundary) {
   for (const part of parts) {
     const headerEnd = part.indexOf('\r\n\r\n');
     if (headerEnd === -1) continue;
-    const headerStr    = part.slice(0, headerEnd).toString('utf8');
-    const body         = part.slice(headerEnd + 4);
-    const nameMatch    = headerStr.match(/name="([^"]+)"/);
+    const headerStr     = part.slice(0, headerEnd).toString('utf8');
+    const body          = part.slice(headerEnd + 4);
+    const nameMatch     = headerStr.match(/name="([^"]+)"/);
     const filenameMatch = headerStr.match(/filename="([^"]+)"/);
     if (!nameMatch) continue;
     const fieldName = nameMatch[1];
@@ -5189,13 +5193,27 @@ function slugify(str) {
 function setCORSHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
 function jsonRes(res, code, data) {
   setCORSHeaders(res);
   res.writeHead(code, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(data));
+}
+
+function getTokenFromHeader(req) {
+  const auth = req.headers['authorization'] || '';
+  if (auth.startsWith('Bearer ')) return auth.slice(7);
+  return null;
+}
+
+function verifyToken(token) {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
 }
 
 // ============================================================
@@ -5216,10 +5234,54 @@ async function saveImage(filename, data) {
 }
 
 // ============================================================
-// SUPABASE — CRUD COMPLETO
+// AUTH — SUPABASE (tabela: utilizadores)
 // ============================================================
 
-// GET — lista todos os produtos
+async function findUserByEmail(email) {
+  const { data, error } = await supabase
+    .from('utilizadores')
+    .select('*')
+    .eq('email', email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function createUser(nome, email, senha) {
+  try {
+    const senhaHash = await bcrypt.hash(senha, SALT_ROUNDS);
+    const { data, error } = await supabase
+      .from('utilizadores')
+      .insert([{ nome: nome.trim(), email: email.toLowerCase().trim(), senha: senhaHash }])
+      .select('id, nome, email, created_at')
+      .single();
+    if (error) {
+      console.error('[createUser] Supabase:', error.code, error.message);
+      if (error.code === '23505') throw new Error('EMAIL_JA_EXISTE');
+      throw new Error(error.message);
+    }
+    return data;
+  } catch(err) {
+    if (err.message === 'EMAIL_JA_EXISTE') throw err;
+    console.error('[createUser] Erro:', err.message);
+    throw err;
+  }
+}
+
+async function findUserById(id) {
+  const { data, error } = await supabase
+    .from('utilizadores')
+    .select('id, nome, email, created_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================
+// SUPABASE — CRUD PRODUTOS
+// ============================================================
+
 async function getProducts() {
   const { data, error } = await supabase
     .from('produtos')
@@ -5240,116 +5302,71 @@ async function getProducts() {
   return data;
 }
 
-// CREATE — insere um produto novo
-// Garante que não existe já um produto com o mesmo id antes de inserir
 async function createProduct(product) {
-  // Usa upsert — se o id já existe actualiza, se não existe cria
   const payload = { ...product, id: String(product.id) };
-
   const { data, error } = await supabase
     .from('produtos')
     .upsert(payload, { onConflict: 'id' })
     .select();
-
   if (error) {
-    console.error('❌ [createProduct] Erro Supabase:', error.message, '| Detalhes:', error.details);
+    console.error('❌ [createProduct] Erro Supabase:', error.message);
     throw error;
   }
-
   const created = (data && data[0]) ? data[0] : payload;
   console.log(`✅ [createProduct] Produto guardado: id=${created.id} | "${created.name}"`);
   return created;
 }
 
-// UPDATE — edita um produto existente pelo id
-// Retorna erro se o id não existir na tabela
 async function updateProduct(id, fields) {
-  // Junta o id no payload e faz upsert — funciona sempre, cria ou actualiza
   const payload = { ...fields, id: String(id) };
-
   const { data, error } = await supabase
     .from('produtos')
     .upsert(payload, { onConflict: 'id' })
     .select();
-
   if (error) {
-    console.error('❌ [updateProduct] Erro Supabase:', error.message, '| Detalhes:', error.details);
+    console.error('❌ [updateProduct] Erro Supabase:', error.message);
     throw error;
   }
-
   const updated = (data && data[0]) ? data[0] : payload;
   console.log(`✅ [updateProduct] Produto actualizado: id=${id} | "${updated.name}"`);
   return updated;
 }
 
-// DELETE — remove um produto pelo id
 async function deleteProduct(id) {
   const { error } = await supabase
     .from('produtos')
     .delete()
     .eq('id', String(id));
-
   if (error) {
-    console.error('❌ [deleteProduct] Erro Supabase:', error.message, '| Detalhes:', error.details);
+    console.error('❌ [deleteProduct] Erro Supabase:', error.message);
     throw error;
   }
-
   console.log(`🗑️  [deleteProduct] Produto removido: id=${id}`);
   return { id };
 }
 
-// BULK — substitui todos os produtos (importação em massa)
 async function bulkReplaceProducts(products) {
-  // Apaga tudo e insere de novo (estratégia simples para bulk import)
   const { error: delError } = await supabase
     .from('produtos')
     .delete()
-    .neq('id', '__never__');   // condição que corresponde a todas as linhas
-
-  if (delError) {
-    console.error('❌ [bulkReplace] Erro ao limpar tabela:', delError.message);
-    throw delError;
-  }
-
-  // Normaliza todos os ids para string
+    .neq('id', '__never__');
+  if (delError) { console.error('❌ [bulkReplace] Erro ao limpar tabela:', delError.message); throw delError; }
   const normalised = products.map(p => ({ ...p, id: String(p.id) }));
-
-  const { error: insError } = await supabase
-    .from('produtos')
-    .insert(normalised);
-
-  if (insError) {
-    console.error('❌ [bulkReplace] Erro ao inserir produtos:', insError.message);
-    throw insError;
-  }
-
+  const { error: insError } = await supabase.from('produtos').insert(normalised);
+  if (insError) { console.error('❌ [bulkReplace] Erro ao inserir produtos:', insError.message); throw insError; }
   console.log(`📦 [bulkReplace] ${products.length} produtos importados com sucesso`);
   return normalised;
 }
 
-// Mantida para compatibilidade com partes do código que ainda a chamam
-async function readProductsFromHTML() {
-  return getProducts();
-}
+async function readProductsFromHTML() { return getProducts(); }
 
-// Mantida para compatibilidade — faz upsert individual
 async function upsertProduct(product) {
   const id = String(product.id);
-
-  const { data: existing } = await supabase
-    .from('produtos')
-    .select('id')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (existing) {
-    return updateProduct(id, product);
-  } else {
-    return createProduct(product);
-  }
+  const { data: existing } = await supabase.from('produtos').select('id').eq('id', id).maybeSingle();
+  if (existing) return updateProduct(id, product);
+  else return createProduct(product);
 }
 
-// Mantida para compatibilidade
 async function removeProduct(id) {
   await deleteProduct(id);
   return getProducts();
@@ -5367,8 +5384,164 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
   // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/register
+  // Cria conta nova com nome, email e senha
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/register') {
+    try {
+      const body = await readBody(req);
+      const { nome, email, senha } = JSON.parse(body.toString('utf8'));
+
+      if (!nome || !email || !senha)
+        return jsonRes(res, 400, { ok: false, error: 'Nome, email e senha são obrigatórios.' });
+
+      if (senha.length < 6)
+        return jsonRes(res, 400, { ok: false, error: 'A senha deve ter pelo menos 6 caracteres.' });
+
+      const user = await createUser(nome, email, senha);
+      const token = jwt.sign({ id: user.id, email: user.email, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
+
+      console.log(`✅ [register] Novo utilizador: ${email}`);
+      return jsonRes(res, 201, { ok: true, token, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      if (err.message === 'EMAIL_JA_EXISTE')
+        return jsonRes(res, 409, { ok: false, error: 'Este email já está registado.' });
+      console.error('❌ [register]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro interno ao criar conta.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/login
+  // Verifica email + senha, devolve token JWT
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/login') {
+    try {
+      const body = await readBody(req);
+      const { email, senha } = JSON.parse(body.toString('utf8'));
+
+      if (!email || !senha)
+        return jsonRes(res, 400, { ok: false, error: 'Email e senha são obrigatórios.' });
+
+      const user = await findUserByEmail(email);
+      if (!user)
+        return jsonRes(res, 401, { ok: false, error: 'Email ou senha incorretos.' });
+
+      const senhaValida = await bcrypt.compare(senha, user.senha);
+      if (!senhaValida)
+        return jsonRes(res, 401, { ok: false, error: 'Email ou senha incorretos.' });
+
+      const token = jwt.sign({ id: user.id, email: user.email, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
+
+      console.log(`✅ [login] Sessão iniciada: ${email}`);
+      return jsonRes(res, 200, { ok: true, token, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      console.error('❌ [login]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro interno ao iniciar sessão.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: GET /api/auth/me
+  // Verifica token JWT e devolve dados do utilizador
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'GET' && pathname === '/api/auth/me') {
+    const token = getTokenFromHeader(req);
+    if (!token) return jsonRes(res, 401, { ok: false, error: 'Token em falta.' });
+
+    const payload = verifyToken(token);
+    if (!payload) return jsonRes(res, 401, { ok: false, error: 'Token inválido ou expirado.' });
+
+    try {
+      const user = await findUserById(payload.id);
+      if (!user) return jsonRes(res, 404, { ok: false, error: 'Utilizador não encontrado.' });
+      return jsonRes(res, 200, { ok: true, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      return jsonRes(res, 500, { ok: false, error: 'Erro ao verificar sessão.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/reset-password
+  // Envia email de recuperação de senha via Supabase Admin
+  // Não precisa do SDK no frontend
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/reset-password') {
+    try {
+      const body = await readBody(req);
+      const { email } = JSON.parse(body.toString('utf8'));
+
+      if (!email) return jsonRes(res, 400, { ok: false, error: 'Email obrigatório.' });
+
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.toLowerCase().trim(),
+        { redirectTo: process.env.SITE_URL ? process.env.SITE_URL + '/?reset=true' : 'https://aquigarcia.onrender.com/?reset=true' }
+      );
+
+      if (error) {
+        console.error('[reset-password] Supabase error:', error.message);
+        // Não revelar se o email existe ou não — sempre responder ok
+      }
+
+      console.log(`📧 [reset-password] Email de recuperação enviado para: ${email}`);
+      // Sempre responder ok para não revelar se o email existe
+      return jsonRes(res, 200, { ok: true });
+    } catch (err) {
+      console.error('❌ [reset-password]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro ao enviar email.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // ROTA: GET /api/config — config pública para o frontend
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'GET' && pathname === '/api/config') {
+    return jsonRes(res, 200, {
+      ok: true,
+      supabaseUrl:     process.env.SUPABASE_URL,
+      supabaseAnonKey: SUPABASE_ANON,
+    });
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/oauth
+  // Recebe dados do Supabase OAuth (Google/Facebook),
+  // sincroniza utilizador na tabela, devolve JWT próprio
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/oauth') {
+    try {
+      const body = await readBody(req);
+      const { access_token, nome: nomeOauth, email: emailOauth } = JSON.parse(body.toString('utf8'));
+
+      if (!access_token || !emailOauth)
+        return jsonRes(res, 400, { ok: false, error: 'Dados OAuth inválidos.' });
+
+      let dbUser = await findUserByEmail(emailOauth);
+      if (!dbUser) {
+        const nomeReal = nomeOauth || emailOauth.split('@')[0];
+        const senhaRnd = crypto.randomBytes(32).toString('hex');
+        dbUser = await createUser(nomeReal, emailOauth, senhaRnd);
+      }
+
+      const token = jwt.sign(
+        { id: dbUser.id, email: dbUser.email, nome: dbUser.nome },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      console.log(`✅ [oauth] Login OAuth: ${emailOauth}`);
+      return jsonRes(res, 200, {
+        ok: true, token,
+        user: { id: dbUser.id, nome: dbUser.nome, email: dbUser.email },
+      });
+    } catch (err) {
+      console.error('❌ [oauth]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro no login OAuth.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
   // ROTA: POST /upload
-  // Envia imagem directamente para o Cloudinary
   // ──────────────────────────────────────────────────────────
   if (req.method === 'POST' && pathname === '/upload') {
     try {
@@ -5379,7 +5552,6 @@ const server = http.createServer(async (req, res) => {
           const buffer = Buffer.concat(chunks);
           if (buffer.length === 0)
             return jsonRes(res, 400, { ok: false, error: 'Arquivo vazio' });
-
           const fileName = 'upload_' + Date.now() + '_' + Math.round(Math.random() * 1e9);
           const cloudUrl = await saveImage(fileName, buffer);
           console.log(`📸 [upload] Imagem enviada para Cloudinary: ${cloudUrl}`);
@@ -5397,7 +5569,6 @@ const server = http.createServer(async (req, res) => {
 
   // ──────────────────────────────────────────────────────────
   // ROTA: GET /api/products
-  // Lista todos os produtos do Supabase
   // ──────────────────────────────────────────────────────────
   if (req.method === 'GET' && pathname === '/api/products') {
     try {
@@ -5410,7 +5581,6 @@ const server = http.createServer(async (req, res) => {
 
   // ──────────────────────────────────────────────────────────
   // ROTA: POST /api/products/bulk
-  // Importação em massa — substitui todos os produtos
   // ──────────────────────────────────────────────────────────
   if (req.method === 'POST' && pathname === '/api/products/bulk') {
     try {
@@ -5425,7 +5595,6 @@ const server = http.createServer(async (req, res) => {
 
   // ──────────────────────────────────────────────────────────
   // ROTA: POST /api/products
-  // Cria um produto NOVO — falha se o id já existir
   // ──────────────────────────────────────────────────────────
   if (req.method === 'POST' && pathname === '/api/products') {
     try {
@@ -5437,21 +5606,19 @@ const server = http.createServer(async (req, res) => {
         const boundary = ct.split('boundary=')[1];
         const { fields, files } = parseMultipart(body, boundary);
         let imgPath = fields.img || '';
-
         if (files.image && files.image.data.length > 0) {
           const ext      = path.extname(files.image.filename) || '.jpg';
           const filename = slugify(fields.name) + '_' + Date.now() + ext;
           imgPath        = await saveImage(filename, files.image.data);
         }
-
         product = {
-          id:       fields.id || String(Date.now()),
-          name:     fields.name     || '',
-          category: fields.category || 'escritorio',
-          price:    parseFloat(fields.price)  || 0,
-          stock:    parseInt(fields.stock, 10) || 0,
-          desc:     fields.desc     || '',
-          img:      imgPath,
+          id:        fields.id || String(Date.now()),
+          name:      fields.name     || '',
+          category:  fields.category || 'escritorio',
+          price:     parseFloat(fields.price)  || 0,
+          stock:     parseInt(fields.stock, 10) || 0,
+          desc:      fields.desc     || '',
+          img:       imgPath,
           encomenda: fields.encomenda === 'true',
         };
       } else {
@@ -5469,7 +5636,6 @@ const server = http.createServer(async (req, res) => {
 
   // ──────────────────────────────────────────────────────────
   // ROTA: PUT /api/products/:id
-  // Edita um produto existente — falha se o id NÃO existir
   // ──────────────────────────────────────────────────────────
   if (req.method === 'PUT' && pathname.startsWith('/api/products/')) {
     try {
@@ -5482,7 +5648,6 @@ const server = http.createServer(async (req, res) => {
         const boundary = ct.split('boundary=')[1];
         const parsed   = parseMultipart(body, boundary);
         fields         = parsed.fields;
-
         if (parsed.files.image && parsed.files.image.data.length > 0) {
           const ext      = path.extname(parsed.files.image.filename) || '.jpg';
           const filename = slugify(fields.name || id) + '_' + Date.now() + ext;
@@ -5492,9 +5657,8 @@ const server = http.createServer(async (req, res) => {
         fields = JSON.parse(body.toString('utf8'));
       }
 
-      // Normaliza tipos
-      if (fields.price  !== undefined) fields.price  = parseFloat(fields.price)   || 0;
-      if (fields.stock  !== undefined) fields.stock  = parseInt(fields.stock, 10)  || 0;
+      if (fields.price     !== undefined) fields.price     = parseFloat(fields.price)   || 0;
+      if (fields.stock     !== undefined) fields.stock     = parseInt(fields.stock, 10)  || 0;
       if (fields.encomenda !== undefined) fields.encomenda = fields.encomenda === 'true' || fields.encomenda === true;
 
       const updated = await updateProduct(id, fields);
@@ -5507,7 +5671,6 @@ const server = http.createServer(async (req, res) => {
 
   // ──────────────────────────────────────────────────────────
   // ROTA: DELETE /api/products/:id
-  // Remove um produto pelo id — falha se não existir
   // ──────────────────────────────────────────────────────────
   if (req.method === 'DELETE' && pathname.startsWith('/api/products/')) {
     try {
@@ -5521,7 +5684,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ──────────────────────────────────────────────────────────
-  // SERVIDOR DE FICHEIROS ESTÁTICOS — SEM ALTERAÇÕES
+  // FICHEIROS ESTÁTICOS
   // ──────────────────────────────────────────────────────────
   let filePath = pathname === '/' ? '/index.html' : pathname;
   filePath = path.join(ROOT, filePath);
@@ -5548,19 +5711,15 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('╠════════════════════════════════════════════╣');
   console.log(`║   Porta: ${PORT}                               ║`);
   console.log('║   Admin: Sobre Nós → Painel de Gestão      ║');
-  console.log('║   Senha: admin123                           ║');
   console.log('╠════════════════════════════════════════════╣');
+  console.log('║   AUTH  → /api/auth/register               ║');
+  console.log('║   AUTH  → /api/auth/login                  ║');
+  console.log('║   AUTH  → /api/auth/me                     ║');
+  console.log('║   AUTH  → /api/auth/oauth (Google/FB)      ║');
+  console.log('║   AUTH  → /api/auth/reset-password         ║');
+  console.log('║   CONFIG → /api/config                     ║');
   console.log('║   BD: Supabase ☁️   Imagens: Cloudinary ☁️  ║');
   console.log('╚════════════════════════════════════════════╝');
-  console.log('');
-  console.log('   Rotas disponíveis:');
-  console.log('   GET    /api/products');
-  console.log('   POST   /api/products        ← criar');
-  console.log('   PUT    /api/products/:id    ← editar');
-  console.log('   DELETE /api/products/:id    ← remover');
-  console.log('   POST   /api/products/bulk   ← importar massa');
-  console.log('');
-  console.log('   Aguardando pedidos...');
   console.log('');
 });
 
