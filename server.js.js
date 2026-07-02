@@ -5082,27 +5082,26 @@ const defaultProducts = [
     "encomenda": false
   }
 ];
-
 // ============================================================
-// DEPENDÊNCIAS — ANTES: só http, fs, path, url (built-in)
-//               DEPOIS: + Supabase + Cloudinary (nuvem)
+// DEPENDÊNCIAS
 // ============================================================
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const url = require('url');
+const http     = require('http');
+const fs       = require('fs');
+const path     = require('path');
+const url      = require('url');
+const crypto   = require('crypto');
 
-// DEPOIS: carregar variáveis de ambiente do ficheiro .env
 require('dotenv').config();
 
-// DEPOIS: cliente Supabase (substitui leitura/escrita no index.html)
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs'); // puro JS — sem problemas de compilação no Render
+const jwt    = require('jsonwebtoken');
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
-// DEPOIS: cliente Cloudinary (substitui guardar imagens em /imagens)
 const cloudinary = require('cloudinary').v2;
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -5110,58 +5109,54 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const PORT = process.env.PORT || 3000;
-const ROOT = __dirname;
-// ANTES: const HTML_FILE = path.join(ROOT, 'index.html');
-// ANTES: const IMG_DIR = path.join(ROOT, 'imagens');
-// DEPOIS: HTML_FILE ainda serve para servir o ficheiro estático ao browser.
-//         IMG_DIR já não é usado para guardar imagens novas.
-const HTML_FILE = path.join(ROOT, 'index.html');
-const IMG_DIR = path.join(ROOT, 'imagens');
+const PORT           = process.env.PORT || 3000;
+const ROOT           = __dirname;
+const HTML_FILE      = path.join(ROOT, 'index.html');
+const IMG_DIR        = path.join(ROOT, 'imagens');
+const JWT_SECRET     = process.env.JWT_SECRET || 'aquigarcia_jwt_secret_2026_seguro';
+const SALT_ROUNDS    = 10;
+const SUPABASE_ANON  = process.env.SUPABASE_ANON_KEY || '';
 
-// Manter a pasta /imagens para imagens antigas que ainda possam existir localmente
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript',
-  '.css': 'text/css',
+  '.js':   'application/javascript',
+  '.css':  'text/css',
   '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
+  '.png':  'image/png',
+  '.jpg':  'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
+  '.gif':  'image/gif',
   '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
+  '.svg':  'image/svg+xml',
+  '.ico':  'image/x-icon',
 };
 
 // ============================================================
-// FUNÇÃO: readBody — SEM ALTERAÇÕES
+// UTILITÁRIOS
 // ============================================================
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     req.on('data', chunk => chunks.push(chunk));
-    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('end',  () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
 }
 
-// ============================================================
-// FUNÇÃO: parseMultipart — SEM ALTERAÇÕES
-// ============================================================
 function parseMultipart(buffer, boundary) {
   const fields = {};
-  const files = {};
-  const sep = Buffer.from('--' + boundary);
-  const parts = [];
+  const files  = {};
+  const sep    = Buffer.from('--' + boundary);
+  const parts  = [];
   let start = 0;
   while (start < buffer.length) {
     const idx = buffer.indexOf(sep, start);
     if (idx === -1) break;
-    const end = buffer.indexOf(sep, idx + sep.length);
-    const part = buffer.slice(idx + sep.length + 2, end === -1? buffer.length : end - 2);
+    const end  = buffer.indexOf(sep, idx + sep.length);
+    const part = buffer.slice(idx + sep.length + 2, end === -1 ? buffer.length : end - 2);
     if (part.length > 0) parts.push(part);
     start = idx + sep.length;
     if (end === -1) break;
@@ -5169,18 +5164,18 @@ function parseMultipart(buffer, boundary) {
   for (const part of parts) {
     const headerEnd = part.indexOf('\r\n\r\n');
     if (headerEnd === -1) continue;
-    const headerStr = part.slice(0, headerEnd).toString('utf8');
-    const body = part.slice(headerEnd + 4);
-    const nameMatch = headerStr.match(/name="([^"]+)"/);
+    const headerStr     = part.slice(0, headerEnd).toString('utf8');
+    const body          = part.slice(headerEnd + 4);
+    const nameMatch     = headerStr.match(/name="([^"]+)"/);
     const filenameMatch = headerStr.match(/filename="([^"]+)"/);
     if (!nameMatch) continue;
     const fieldName = nameMatch[1];
     if (filenameMatch) {
       const ctMatch = headerStr.match(/Content-Type:\s*([^\r\n]+)/i);
       files[fieldName] = {
-        filename: filenameMatch[1],
-        contentType: ctMatch? ctMatch[1].trim() : 'application/octet-stream',
-        data: body
+        filename:    filenameMatch[1],
+        contentType: ctMatch ? ctMatch[1].trim() : 'application/octet-stream',
+        data:        body,
       };
     } else {
       fields[fieldName] = body.toString('utf8').replace(/\r\n$/, '');
@@ -5189,87 +5184,48 @@ function parseMultipart(buffer, boundary) {
   return { fields, files };
 }
 
-// ============================================================
-// FUNÇÃO: readProductsFromHTML
-// ANTES: lia os produtos do bloco /*__PRODUCTS_START__*/ no index.html
-// DEPOIS: lê os produtos da tabela "produtos" no Supabase
-// ============================================================
-async function readProductsFromHTML() {
+function slugify(str) {
+  return (str || 'produto').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function setCORSHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
+function jsonRes(res, code, data) {
+  setCORSHeaders(res);
+  res.writeHead(code, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+function getTokenFromHeader(req) {
+  const auth = req.headers['authorization'] || '';
+  if (auth.startsWith('Bearer ')) return auth.slice(7);
+  return null;
+}
+
+function verifyToken(token) {
   try {
-    const { data, error } = await supabase
-      .from('produtos')
-      .select('*')
-      .order('id', { ascending: true });
-    if (error) throw error;
-    if (!data || data.length === 0) {
-      console.log('⚠️ Supabase vazio, usando defaultProducts');
-      return defaultProducts;
-    }
-    return data;
-  } catch(e) {
-    console.log('⚠️ Erro lendo Supabase:', e.message, '— usando defaultProducts');
-    return defaultProducts;
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
   }
 }
 
 // ============================================================
-// FUNÇÃO: writeProductsToHTML
-// ANTES: reescrevia o bloco /*__PRODUCTS_START__*/ no index.html
-// DEPOIS: faz upsert de todos os produtos no Supabase
-// ============================================================
-async function writeProductsToHTML(products) {
-  const { error } = await supabase
-    .from('produtos')
-    .upsert(products, { onConflict: 'id' });
-  if (error) throw error;
-}
-
-// ============================================================
-// FUNÇÃO: upsertProduct
-// ANTES: chamava readProductsFromHTML + writeProductsToHTML (síncronas)
-// DEPOIS: igual mas com await (agora são assíncronas)
-// ============================================================
-async function upsertProduct(product) {
-  const products = await readProductsFromHTML();
-  const idx = products.findIndex(p => String(p.id) === String(product.id));
-  if (idx > -1) products[idx] = {...products[idx], ...product};
-  else products.push(product);
-  await writeProductsToHTML(products);
-  return products;
-}
-
-// ============================================================
-// FUNÇÃO: removeProduct
-// ANTES: filtrava array local e reescrevia no HTML
-// DEPOIS: deleta directamente no Supabase por id
-// ============================================================
-async function removeProduct(id) {
-  const { error } = await supabase
-    .from('produtos')
-    .delete()
-    .eq('id', String(id));
-  if (error) throw error;
-  return await readProductsFromHTML();
-}
-
-// ============================================================
-// FUNÇÃO: saveImage
-// ANTES: fs.writeFileSync — guardava imagem em /imagens no disco local
-// DEPOIS: uploadToCloudinary — envia imagem para a nuvem Cloudinary
+// CLOUDINARY — saveImage
 // ============================================================
 async function saveImage(filename, data) {
   return new Promise((resolve, reject) => {
-    const publicId = filename.replace(/\.[^.]+$/, ''); // nome sem extensão
+    const publicId = filename.replace(/\.[^.]+$/, '');
     const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: 'aquigarcia',
-        public_id: publicId,
-        overwrite: true,
-        resource_type: 'image',
-      },
+      { folder: 'aquigarcia', public_id: publicId, overwrite: true, resource_type: 'image' },
       (error, result) => {
         if (error) return reject(error);
-        // DEPOIS: devolve o URL permanente do Cloudinary em vez de '/imagens/...'
         resolve(result.secure_url);
       }
     );
@@ -5278,50 +5234,315 @@ async function saveImage(filename, data) {
 }
 
 // ============================================================
-// FUNÇÃO: slugify — SEM ALTERAÇÕES
+// AUTH — SUPABASE (tabela: utilizadores)
 // ============================================================
-function slugify(str) {
-  return (str || 'produto').toLowerCase()
- .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
- .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+async function findUserByEmail(email) {
+  const { data, error } = await supabase
+    .from('utilizadores')
+    .select('*')
+    .eq('email', email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function createUser(nome, email, senha) {
+  try {
+    const senhaHash = await bcrypt.hash(senha, SALT_ROUNDS);
+    const { data, error } = await supabase
+      .from('utilizadores')
+      .insert([{ nome: nome.trim(), email: email.toLowerCase().trim(), senha: senhaHash }])
+      .select('id, nome, email, created_at')
+      .single();
+    if (error) {
+      console.error('[createUser] Supabase:', error.code, error.message);
+      if (error.code === '23505') throw new Error('EMAIL_JA_EXISTE');
+      throw new Error(error.message);
+    }
+    return data;
+  } catch(err) {
+    if (err.message === 'EMAIL_JA_EXISTE') throw err;
+    console.error('[createUser] Erro:', err.message);
+    throw err;
+  }
+}
+
+async function findUserById(id) {
+  const { data, error } = await supabase
+    .from('utilizadores')
+    .select('id, nome, email, created_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 // ============================================================
-// FUNÇÃO: setCORSHeaders — SEM ALTERAÇÕES
+// SUPABASE — CRUD PRODUTOS
 // ============================================================
-function setCORSHeaders(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+async function getProducts() {
+  const { data, error } = await supabase
+    .from('produtos')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if (error) {
+    console.error('❌ [getProducts] Erro Supabase:', error.message);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    console.log('⚠️ [getProducts] Tabela vazia — a usar defaultProducts');
+    return defaultProducts;
+  }
+
+  console.log(`✅ [getProducts] ${data.length} produtos carregados`);
+  return data;
+}
+
+async function createProduct(product) {
+  const payload = { ...product, id: String(product.id) };
+  const { data, error } = await supabase
+    .from('produtos')
+    .upsert(payload, { onConflict: 'id' })
+    .select();
+  if (error) {
+    console.error('❌ [createProduct] Erro Supabase:', error.message);
+    throw error;
+  }
+  const created = (data && data[0]) ? data[0] : payload;
+  console.log(`✅ [createProduct] Produto guardado: id=${created.id} | "${created.name}"`);
+  return created;
+}
+
+async function updateProduct(id, fields) {
+  const payload = { ...fields, id: String(id) };
+  const { data, error } = await supabase
+    .from('produtos')
+    .upsert(payload, { onConflict: 'id' })
+    .select();
+  if (error) {
+    console.error('❌ [updateProduct] Erro Supabase:', error.message);
+    throw error;
+  }
+  const updated = (data && data[0]) ? data[0] : payload;
+  console.log(`✅ [updateProduct] Produto actualizado: id=${id} | "${updated.name}"`);
+  return updated;
+}
+
+async function deleteProduct(id) {
+  const { error } = await supabase
+    .from('produtos')
+    .delete()
+    .eq('id', String(id));
+  if (error) {
+    console.error('❌ [deleteProduct] Erro Supabase:', error.message);
+    throw error;
+  }
+  console.log(`🗑️  [deleteProduct] Produto removido: id=${id}`);
+  return { id };
+}
+
+async function bulkReplaceProducts(products) {
+  const { error: delError } = await supabase
+    .from('produtos')
+    .delete()
+    .neq('id', '__never__');
+  if (delError) { console.error('❌ [bulkReplace] Erro ao limpar tabela:', delError.message); throw delError; }
+  const normalised = products.map(p => ({ ...p, id: String(p.id) }));
+  const { error: insError } = await supabase.from('produtos').insert(normalised);
+  if (insError) { console.error('❌ [bulkReplace] Erro ao inserir produtos:', insError.message); throw insError; }
+  console.log(`📦 [bulkReplace] ${products.length} produtos importados com sucesso`);
+  return normalised;
+}
+
+async function readProductsFromHTML() { return getProducts(); }
+
+async function upsertProduct(product) {
+  const id = String(product.id);
+  const { data: existing } = await supabase.from('produtos').select('id').eq('id', id).maybeSingle();
+  if (existing) return updateProduct(id, product);
+  else return createProduct(product);
+}
+
+async function removeProduct(id) {
+  await deleteProduct(id);
+  return getProducts();
 }
 
 // ============================================================
-// FUNÇÃO: jsonRes — SEM ALTERAÇÕES
-// ============================================================
-function jsonRes(res, code, data) {
-  setCORSHeaders(res);
-  res.writeHead(code, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(data));
-}
-
-// ============================================================
-// SERVIDOR HTTP — ROTAS
-// Estrutura 100% idêntica ao original.
-// Só as funções internas mudaram (agora com await).
+// SERVIDOR HTTP
 // ============================================================
 const server = http.createServer(async (req, res) => {
-  const parsed = url.parse(req.url, true);
+  const parsed   = url.parse(req.url, true);
   const pathname = parsed.pathname;
 
   setCORSHeaders(res);
 
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/register
+  // Cria conta nova com nome, email e senha
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/register') {
+    try {
+      const body = await readBody(req);
+      const { nome, email, senha } = JSON.parse(body.toString('utf8'));
+
+      if (!nome || !email || !senha)
+        return jsonRes(res, 400, { ok: false, error: 'Nome, email e senha são obrigatórios.' });
+
+      if (senha.length < 6)
+        return jsonRes(res, 400, { ok: false, error: 'A senha deve ter pelo menos 6 caracteres.' });
+
+      const user = await createUser(nome, email, senha);
+      const token = jwt.sign({ id: user.id, email: user.email, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
+
+      console.log(`✅ [register] Novo utilizador: ${email}`);
+      return jsonRes(res, 201, { ok: true, token, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      if (err.message === 'EMAIL_JA_EXISTE')
+        return jsonRes(res, 409, { ok: false, error: 'Este email já está registado.' });
+      console.error('❌ [register]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro interno ao criar conta.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/login
+  // Verifica email + senha, devolve token JWT
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/login') {
+    try {
+      const body = await readBody(req);
+      const { email, senha } = JSON.parse(body.toString('utf8'));
+
+      if (!email || !senha)
+        return jsonRes(res, 400, { ok: false, error: 'Email e senha são obrigatórios.' });
+
+      const user = await findUserByEmail(email);
+      if (!user)
+        return jsonRes(res, 401, { ok: false, error: 'Email ou senha incorretos.' });
+
+      const senhaValida = await bcrypt.compare(senha, user.senha);
+      if (!senhaValida)
+        return jsonRes(res, 401, { ok: false, error: 'Email ou senha incorretos.' });
+
+      const token = jwt.sign({ id: user.id, email: user.email, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
+
+      console.log(`✅ [login] Sessão iniciada: ${email}`);
+      return jsonRes(res, 200, { ok: true, token, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      console.error('❌ [login]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro interno ao iniciar sessão.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: GET /api/auth/me
+  // Verifica token JWT e devolve dados do utilizador
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'GET' && pathname === '/api/auth/me') {
+    const token = getTokenFromHeader(req);
+    if (!token) return jsonRes(res, 401, { ok: false, error: 'Token em falta.' });
+
+    const payload = verifyToken(token);
+    if (!payload) return jsonRes(res, 401, { ok: false, error: 'Token inválido ou expirado.' });
+
+    try {
+      const user = await findUserById(payload.id);
+      if (!user) return jsonRes(res, 404, { ok: false, error: 'Utilizador não encontrado.' });
+      return jsonRes(res, 200, { ok: true, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+      return jsonRes(res, 500, { ok: false, error: 'Erro ao verificar sessão.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/reset-password
+  // Envia email de recuperação de senha via Supabase Admin
+  // Não precisa do SDK no frontend
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/reset-password') {
+    try {
+      const body = await readBody(req);
+      const { email } = JSON.parse(body.toString('utf8'));
+
+      if (!email) return jsonRes(res, 400, { ok: false, error: 'Email obrigatório.' });
+
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.toLowerCase().trim(),
+        { redirectTo: process.env.SITE_URL ? process.env.SITE_URL + '/?reset=true' : 'https://aquigarcia.onrender.com/?reset=true' }
+      );
+
+      if (error) {
+        console.error('[reset-password] Supabase error:', error.message);
+        // Não revelar se o email existe ou não — sempre responder ok
+      }
+
+      console.log(`📧 [reset-password] Email de recuperação enviado para: ${email}`);
+      // Sempre responder ok para não revelar se o email existe
+      return jsonRes(res, 200, { ok: true });
+    } catch (err) {
+      console.error('❌ [reset-password]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro ao enviar email.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // ROTA: GET /api/config — config pública para o frontend
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'GET' && pathname === '/api/config') {
+    return jsonRes(res, 200, {
+      ok: true,
+      supabaseUrl:     process.env.SUPABASE_URL,
+      supabaseAnonKey: SUPABASE_ANON,
+    });
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // AUTH: POST /api/auth/oauth
+  // Recebe dados do Supabase OAuth (Google/Facebook),
+  // sincroniza utilizador na tabela, devolve JWT próprio
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/auth/oauth') {
+    try {
+      const body = await readBody(req);
+      const { access_token, nome: nomeOauth, email: emailOauth } = JSON.parse(body.toString('utf8'));
+
+      if (!access_token || !emailOauth)
+        return jsonRes(res, 400, { ok: false, error: 'Dados OAuth inválidos.' });
+
+      let dbUser = await findUserByEmail(emailOauth);
+      if (!dbUser) {
+        const nomeReal = nomeOauth || emailOauth.split('@')[0];
+        const senhaRnd = crypto.randomBytes(32).toString('hex');
+        dbUser = await createUser(nomeReal, emailOauth, senhaRnd);
+      }
+
+      const token = jwt.sign(
+        { id: dbUser.id, email: dbUser.email, nome: dbUser.nome },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      console.log(`✅ [oauth] Login OAuth: ${emailOauth}`);
+      return jsonRes(res, 200, {
+        ok: true, token,
+        user: { id: dbUser.id, nome: dbUser.nome, email: dbUser.email },
+      });
+    } catch (err) {
+      console.error('❌ [oauth]', err.message);
+      return jsonRes(res, 500, { ok: false, error: 'Erro no login OAuth.' });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
   // ROTA: POST /upload
-  // ANTES: guardava buffer em disco → /imagens/FICHEIRO.jpg
-  // DEPOIS: envia buffer para Cloudinary → URL permanente
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
   if (req.method === 'POST' && pathname === '/upload') {
     try {
       const chunks = [];
@@ -5329,129 +5550,148 @@ const server = http.createServer(async (req, res) => {
       req.on('end', async () => {
         try {
           const buffer = Buffer.concat(chunks);
-          if (buffer.length === 0) {
+          if (buffer.length === 0)
             return jsonRes(res, 400, { ok: false, error: 'Arquivo vazio' });
-          }
-          // ANTES: const fileName = Date.now() + '-' + ... + '.jpg';
-          // ANTES: fs.writeFileSync(filePath, buffer);
-          // DEPOIS: upload directo para Cloudinary
-          const fileName = 'upload_' + Date.now() + '_' + Math.round(Math.random() * 1E9);
+          const fileName = 'upload_' + Date.now() + '_' + Math.round(Math.random() * 1e9);
           const cloudUrl = await saveImage(fileName, buffer);
-          console.log(`📸 [${new Date().toLocaleTimeString()}] Imagem enviada para Cloudinary: ${cloudUrl}`);
-          // ANTES: return jsonRes(res, 200, { ok: true, url: '/imagens/' + fileName });
-          // DEPOIS: devolve o URL do Cloudinary directamente
+          console.log(`📸 [upload] Imagem enviada para Cloudinary: ${cloudUrl}`);
           return jsonRes(res, 200, { ok: true, url: cloudUrl });
         } catch (err) {
-          console.error('Erro no upload Cloudinary:', err.message);
+          console.error('❌ [upload] Erro Cloudinary:', err.message);
           return jsonRes(res, 500, { ok: false, error: err.message });
         }
       });
     } catch (err) {
-      console.error('Erro no upload:', err.message);
       return jsonRes(res, 500, { ok: false, error: err.message });
     }
     return;
   }
 
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
   // ROTA: GET /api/products
-  // ANTES: lia do index.html (síncrono)
-  // DEPOIS: lê do Supabase (assíncrono)
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
   if (req.method === 'GET' && pathname === '/api/products') {
-    const products = await readProductsFromHTML();
-    return jsonRes(res, 200, { ok: true, products, total: products.length });
-  }
-
-  // ----------------------------------------------------------
-  // ROTA: POST /api/products/bulk
-  // ANTES: writeProductsToHTML (síncrono)
-  // DEPOIS: upsert no Supabase (assíncrono)
-  // ----------------------------------------------------------
-  if (req.method === 'POST' && pathname === '/api/products/bulk') {
     try {
-      const body = await readBody(req);
-      const products = JSON.parse(body.toString('utf8'));
-      await writeProductsToHTML(products);
-      console.log(`📦 Catálogo actualizado: ${products.length} produtos`);
-      return jsonRes(res, 200, { ok: true, total: products.length });
+      const products = await getProducts();
+      return jsonRes(res, 200, { ok: true, products, total: products.length });
     } catch (err) {
       return jsonRes(res, 500, { ok: false, error: err.message });
     }
   }
 
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
+  // ROTA: POST /api/products/bulk
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && pathname === '/api/products/bulk') {
+    try {
+      const body     = await readBody(req);
+      const products = JSON.parse(body.toString('utf8'));
+      const result   = await bulkReplaceProducts(products);
+      return jsonRes(res, 200, { ok: true, total: result.length });
+    } catch (err) {
+      return jsonRes(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
   // ROTA: POST /api/products
-  // ANTES: saveImage guardava em disco, upsertProduct escrevia no HTML
-  // DEPOIS: saveImage envia para Cloudinary, upsertProduct salva no Supabase
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
   if (req.method === 'POST' && pathname === '/api/products') {
     try {
       const body = await readBody(req);
-      const ct = req.headers['content-type'] || '';
+      const ct   = req.headers['content-type'] || '';
       let product;
+
       if (ct.includes('multipart/form-data')) {
         const boundary = ct.split('boundary=')[1];
         const { fields, files } = parseMultipart(body, boundary);
         let imgPath = fields.img || '';
         if (files.image && files.image.data.length > 0) {
-          const ext = path.extname(files.image.filename) || '.jpg';
+          const ext      = path.extname(files.image.filename) || '.jpg';
           const filename = slugify(fields.name) + '_' + Date.now() + ext;
-          // ANTES: imgPath = saveImage(filename, files.image.data); // síncrono, disco local
-          // DEPOIS: imgPath agora é URL do Cloudinary
-          imgPath = await saveImage(filename, files.image.data);
+          imgPath        = await saveImage(filename, files.image.data);
         }
         product = {
-          id: fields.id || Date.now().toString(),
-          name: fields.name || '',
-          category: fields.category || 'escritorio',
-          price: parseFloat(fields.price) || 0,
-          stock: parseInt(fields.stock) || 0,
-          desc: fields.desc || '',
-          img: imgPath
+          id:        fields.id || String(Date.now()),
+          name:      fields.name     || '',
+          category:  fields.category || 'escritorio',
+          price:     parseFloat(fields.price)  || 0,
+          stock:     parseInt(fields.stock, 10) || 0,
+          desc:      fields.desc     || '',
+          img:       imgPath,
+          encomenda: fields.encomenda === 'true',
         };
       } else {
         product = JSON.parse(body.toString('utf8'));
       }
-      // ANTES: const products = upsertProduct(product); // síncrono
-      // DEPOIS: await upsertProduct(product); // assíncrono (Supabase)
-      const products = await upsertProduct(product);
-      console.log(`✅ [${new Date().toLocaleTimeString()}] Produto guardado: "${product.name}"`);
-      return jsonRes(res, 200, { ok: true, product, total: products.length });
+
+      const created = await createProduct(product);
+      const total   = (await getProducts()).length;
+      return jsonRes(res, 201, { ok: true, product: created, total });
     } catch (err) {
-      console.error('Erro:', err.message);
-      return jsonRes(res, 500, { ok: false, error: err.message });
+      const code = err.message.includes('já existe') ? 409 : 500;
+      return jsonRes(res, code, { ok: false, error: err.message });
     }
   }
 
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
+  // ROTA: PUT /api/products/:id
+  // ──────────────────────────────────────────────────────────
+  if (req.method === 'PUT' && pathname.startsWith('/api/products/')) {
+    try {
+      const id   = decodeURIComponent(pathname.replace('/api/products/', ''));
+      const body = await readBody(req);
+      const ct   = req.headers['content-type'] || '';
+      let fields = {};
+
+      if (ct.includes('multipart/form-data')) {
+        const boundary = ct.split('boundary=')[1];
+        const parsed   = parseMultipart(body, boundary);
+        fields         = parsed.fields;
+        if (parsed.files.image && parsed.files.image.data.length > 0) {
+          const ext      = path.extname(parsed.files.image.filename) || '.jpg';
+          const filename = slugify(fields.name || id) + '_' + Date.now() + ext;
+          fields.img     = await saveImage(filename, parsed.files.image.data);
+        }
+      } else {
+        fields = JSON.parse(body.toString('utf8'));
+      }
+
+      if (fields.price     !== undefined) fields.price     = parseFloat(fields.price)   || 0;
+      if (fields.stock     !== undefined) fields.stock     = parseInt(fields.stock, 10)  || 0;
+      if (fields.encomenda !== undefined) fields.encomenda = fields.encomenda === 'true' || fields.encomenda === true;
+
+      const updated = await updateProduct(id, fields);
+      return jsonRes(res, 200, { ok: true, product: updated });
+    } catch (err) {
+      const code = err.message.includes('não encontrado') ? 404 : 500;
+      return jsonRes(res, code, { ok: false, error: err.message });
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
   // ROTA: DELETE /api/products/:id
-  // ANTES: removeProduct filtrava array e reescrevia HTML
-  // DEPOIS: removeProduct apaga directamente no Supabase
-  // ----------------------------------------------------------
+  // ──────────────────────────────────────────────────────────
   if (req.method === 'DELETE' && pathname.startsWith('/api/products/')) {
     try {
-      const id = decodeURIComponent(pathname.replace('/api/products/', ''));
-      // ANTES: const products = removeProduct(id); // síncrono
-      // DEPOIS: await removeProduct(id); // assíncrono (Supabase)
-      const products = await removeProduct(id);
-      console.log(`🗑️ [${new Date().toLocaleTimeString()}] Produto removido: id=${id}`);
-      return jsonRes(res, 200, { ok: true, total: products.length });
+      const id     = decodeURIComponent(pathname.replace('/api/products/', ''));
+      const result = await deleteProduct(id);
+      return jsonRes(res, 200, { ok: true, deleted: result });
     } catch (err) {
-      return jsonRes(res, 500, { ok: false, error: err.message });
+      const code = err.message.includes('não encontrado') ? 404 : 500;
+      return jsonRes(res, code, { ok: false, error: err.message });
     }
   }
 
-  // ----------------------------------------------------------
-  // SERVIDOR DE FICHEIROS ESTÁTICOS — SEM ALTERAÇÕES
-  // Serve index.html, CSS, JS, imagens antigas em /imagens, etc.
-  // ----------------------------------------------------------
-  let filePath = pathname === '/'? '/index.html' : pathname;
+  // ──────────────────────────────────────────────────────────
+  // FICHEIROS ESTÁTICOS
+  // ──────────────────────────────────────────────────────────
+  let filePath = pathname === '/' ? '/index.html' : pathname;
   filePath = path.join(ROOT, filePath);
   if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    const ext = path.extname(filePath);
+    const ext  = path.extname(filePath);
     const mime = MIME[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': mime });
     fs.createReadStream(filePath).pipe(res);
@@ -5461,6 +5701,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+// ============================================================
+// INICIALIZAÇÃO DO SERVIDOR
+// ============================================================
 server.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('╔════════════════════════════════════════════╗');
@@ -5468,12 +5711,15 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('╠════════════════════════════════════════════╣');
   console.log(`║   Porta: ${PORT}                               ║`);
   console.log('║   Admin: Sobre Nós → Painel de Gestão      ║');
-  console.log('║   Senha: admin123                           ║');
   console.log('╠════════════════════════════════════════════╣');
+  console.log('║   AUTH  → /api/auth/register               ║');
+  console.log('║   AUTH  → /api/auth/login                  ║');
+  console.log('║   AUTH  → /api/auth/me                     ║');
+  console.log('║   AUTH  → /api/auth/oauth (Google/FB)      ║');
+  console.log('║   AUTH  → /api/auth/reset-password         ║');
+  console.log('║   CONFIG → /api/config                     ║');
   console.log('║   BD: Supabase ☁️   Imagens: Cloudinary ☁️  ║');
   console.log('╚════════════════════════════════════════════╝');
-  console.log('');
-  console.log('   Aguardando pedidos...');
   console.log('');
 });
 
